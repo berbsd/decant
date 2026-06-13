@@ -1,8 +1,93 @@
-/target
+# =============================================================================
+# Git Ignore Configuration
+# =============================================================================
+# Files and directories that should not be committed to version control.
+#
+# To add project-specific ignores without modifying this file:
+#   1. Create .git/info/exclude (local only, not committed)
+#   2. Or add to ~/.config/git/ignore (global)
+#
+# Note: gitignore only treats `#` as a comment when it starts the line.
+# Inline comments after a pattern are interpreted as part of the pattern.
+# =============================================================================
+
+# --- Rust Build Artifacts ---
+# Backup files from rustfmt
 **/*.rs.bk
+# Windows debug symbols
 *.pdb
-.DS_Store
+target/
+# sccache cache directory (see .envrc)
 .sccache/
 
-# Local-only design docs (specs/plans) — not tracked
-/docs/
+# Cargo.lock is tracked because this workspace contains binary services.
+# For library-only workspaces, uncomment to exclude it:
+# Cargo.lock
+
+# --- macOS ---
+.DS_Store
+.LSOverride
+Icon
+._*
+*.icloud
+
+# --- Environment & Secrets ---
+# Environment variables (may contain secrets)
+.env
+# Local overrides
+.env.local
+# .envrc is intentionally tracked (no secrets, just PATH setup)
+# direnv cache
+.direnv
+
+# --- Security/Credentials (NEVER commit these) ---
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.priv
+*.p12
+*.pfx
+
+# --- IDE/Editor ---
+# JetBrains IDEs
+.idea/
+# VS Code (uncomment to track shared settings)
+.vscode/
+# Vim swap files
+*.swp
+*.swo
+# Backup files
+*~
+
+# --- Testing & Coverage ---
+# Coverage reports already live under target/ (gitignored above)
+# Raw coverage data
+*.profraw
+# Processed coverage data
+*.profdata
+
+# --- Documentation ---
+# Ignore scratch/generated markdown; allowlist standard project docs
+**/*.md
+!**/README*.md
+!**/TODO.md
+!**/CLAUDE.md
+!**/PULL_REQUEST_TEMPLATE.md
+
+# --- Claude Code ---
+# Track .claude/ contents (slash commands, etc.) but exclude per-user state
+!.claude
+!.claude/**/*.md
+.claude/settings.local.json
+.claude/worktrees
+
+# Hook reports (transient)
+.claude/hooks/.last-*.txt
+
+# Scheduled-task session lock (transient runtime state)
+.claude/scheduled_tasks.lock
+
+# ignore obsidian
+.obsidian
