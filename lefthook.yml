@@ -1,0 +1,19 @@
+output:
+  - summary
+  - failure
+
+pre-commit:
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --no-banner
+    typos:
+      run: typos
+    rustfmt:
+      glob: "*.rs"
+      run: cargo +nightly fmt
+      stage_fixed: true
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: cog verify "$(cat {1})"

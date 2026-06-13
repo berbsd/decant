@@ -1,0 +1,120 @@
+# =============================================================================
+# Taplo Configuration
+# =============================================================================
+# TOML file formatting and linting configuration.
+# Run with: taplo format (or `just fmt`)
+#
+# Documentation: https://taplo.tamasfe.dev/configuration/
+#
+# Taplo provides:
+# - Consistent TOML formatting across Cargo.toml, deny.toml, etc.
+# - Schema validation for known TOML file types
+# - Integration with editors via LSP
+# =============================================================================
+
+# Include all TOML files by default
+include = ["**/*.toml"]
+
+# Exclude build artifacts and dependencies
+exclude = ["target/**", ".claude/**"]
+
+# =============================================================================
+# Global Formatting Options
+# =============================================================================
+
+[formatting]
+# Align consecutive entries in tables
+align_entries = true
+
+# Align comments after entries
+align_comments = true
+
+# Number of spaces for indentation (use 2 to match Rust code style)
+indent_string = "  "
+
+# Put closing brackets on same line for single-line arrays
+array_trailing_comma = true
+
+# Put closing brackets on new line for multi-line arrays
+array_auto_expand = true
+
+# Collapse arrays that fit on one line
+array_auto_collapse = true
+
+# Maximum line width before arrays expand to multiple lines
+column_width = 100
+
+# Compact arrays with single values
+compact_arrays = true
+
+# Compact inline tables
+compact_inline_tables = false
+
+# Put entries on new lines in inline tables
+inline_table_expand = false
+
+# Reorder keys alphabetically
+reorder_keys = false
+
+# Reorder arrays alphabetically
+reorder_arrays = false
+
+# Add trailing newline to file
+trailing_newline = true
+
+# Number of allowed consecutive blank lines
+allowed_blank_lines = 1
+
+# Use CRLF line endings (false = LF)
+crlf = false
+
+# =============================================================================
+# Schema Associations
+# =============================================================================
+# Taplo can validate TOML files against JSON schemas
+
+[[rule]]
+# Cargo.toml files
+include = ["**/Cargo.toml"]
+keys    = ["package", "dependencies", "workspace"]
+
+[rule.formatting]
+reorder_keys   = true # Preserve intentional ordering in workspace manifest
+reorder_arrays = true
+
+[rule.schema]
+path = "https://json.schemastore.org/cargo.json"
+
+[[rule]]
+# rustfmt configuration
+include = ["**/rustfmt.toml", "**/.rustfmt.toml"]
+
+[rule.schema]
+path = "https://json.schemastore.org/rustfmt.json"
+
+[[rule]]
+# cargo-deny configuration
+include = ["**/deny.toml"]
+
+[rule.schema]
+path = "https://embarkstudios.github.io/cargo-deny/deny.schema.json"
+
+# =============================================================================
+# File-Specific Rules
+# =============================================================================
+
+[[rule]]
+# Keep workspace Cargo.toml sections in a specific order
+include = ["Cargo.toml"]
+
+[rule.formatting]
+reorder_keys   = true # Preserve intentional ordering in workspace manifest
+reorder_arrays = true
+
+[[rule]]
+# Cargo aliases use positional arrays (e.g. ["-D", "clippy::unwrap_used"]) —
+# reordering breaks the pairing between flags and their arguments.
+include = [".cargo/config.toml"]
+
+[rule.formatting]
+reorder_arrays = false

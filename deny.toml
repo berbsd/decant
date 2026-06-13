@@ -1,0 +1,60 @@
+# =============================================================================
+# cargo-deny Configuration
+# =============================================================================
+# Security and license compliance checking for dependencies.
+# Run with: `cargo deny check` or `just check`
+#
+# Documentation: https://embarkstudios.github.io/cargo-deny/
+#
+# This file controls:
+# - [advisories]: Security vulnerability checking (RustSec database)
+# - [licenses]: Allowed licenses for dependencies
+# - [bans]: Dependency bans and duplicate detection
+# - [sources]: Where dependencies can be fetched from
+# =============================================================================
+
+[advisories]
+# Security vulnerability database from https://rustsec.org/
+version      = 2
+ignore       = []          # List of advisory IDs to ignore (e.g., ["RUSTSEC-2020-0001"])
+unmaintained = "workspace" # Warn about unmaintained crates at workspace level
+
+[licenses]
+# Allowed licenses for dependencies (NOT your project's license)
+# Your project can use any license; this controls what your dependencies use.
+#
+# Common permissive licenses that are safe to allow:
+version = 2 # cargo-deny licenses schema version
+unused-allowed-license = "allow" # Don't warn about unused allowed licenses
+private = { ignore = true } # Skip license checks for unpublished workspace members
+allow = [
+  "Apache-2.0",                     # Permissive, patent grant
+  "Apache-2.0 WITH LLVM-exception", # LLVM variant
+  "BSD-2-Clause",                   # Simplified BSD
+  "BSD-3-Clause",                   # New BSD
+  "BSL-1.0",                        # Boost Software License
+  "CC0-1.0",                        # Public domain dedication
+  "CDLA-Permissive-2.0",            # Linux Foundation permissive (webpki-roots ≥1.0)
+  "ISC",                            # ISC license (OpenBSD)
+  "MIT",                            # Most permissive
+  "MPL-2.0",                        # Mozilla Public License (weak copyleft, file-level)
+  "Unicode-3.0",                    # Unicode license (for unicode-ident, etc.)
+  "Unlicense",                      # Public domain
+  "Zlib",                           # zlib license
+]
+confidence-threshold = 0.93 # Minimum confidence for license detection
+exceptions = [] # Specific crate exceptions: [{ name = "crate", allow = ["GPL-3.0"] }]
+
+[bans]
+# Dependency bans and duplicate detection
+multiple-versions    = "warn" # Warn if multiple versions of same crate
+wildcards            = "deny" # Deny wildcard dependencies (e.g., `dep = "*"`)
+allow-wildcard-paths = true   # Allow path dependencies (workspace crates) without versions
+# skip = []                    # Crates to skip duplicate checking
+# deny = []                    # Explicitly banned crates
+
+[sources]
+# Where dependencies can come from
+unknown-git      = "deny" # Deny unknown git repositories
+unknown-registry = "deny" # Deny unknown registries (only crates.io allowed)
+# allow-git = []               # Allowed git repositories

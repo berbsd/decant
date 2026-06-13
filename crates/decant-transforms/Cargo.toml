@@ -1,0 +1,15 @@
+[package]
+authors.workspace = true
+description       = "Built-in decant transforms"
+edition.workspace = true
+license.workspace = true
+name              = "decant-transforms"
+publish.workspace = true
+readme            = "README.md"
+version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+decant-core = { path = "../decant-core" }

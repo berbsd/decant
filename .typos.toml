@@ -1,0 +1,11 @@
+[files]
+extend-exclude = ["target/", "*.lock", ".claude/"]
+
+[default]
+# Base64-encoded examples (JWTs, cursors) start with `ey` and produce
+# false positives. Skip any contiguous base64 run anchored on `ey`.
+extend-ignore-re = ["ey[A-Za-z0-9+/=]{16,}"]
+
+[default.extend-words]
+# ISO 3166-2 state code for North Dakota — typos wants to fix it to AND.
+ND = "ND"

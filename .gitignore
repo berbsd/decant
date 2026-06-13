@@ -1,0 +1,8 @@
+/target
+**/*.rs.bk
+*.pdb
+.DS_Store
+.sccache/
+
+# Local-only design docs (specs/plans) — not tracked
+/docs/

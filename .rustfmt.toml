@@ -1,0 +1,109 @@
+# =============================================================================
+# Rustfmt Configuration
+# =============================================================================
+# Code formatting rules for the workspace.
+# Run with: cargo +nightly fmt (requires nightly for unstable features)
+#
+# Documentation: https://rust-lang.github.io/rustfmt/
+#
+# IMPORTANT: This config uses unstable features requiring nightly rustfmt.
+# The justfile uses `cargo +nightly fmt` to handle this automatically.
+#
+# To customize:
+# - Adjust values below to match your team's preferences
+# - Remove `unstable_features = true` to use only stable options
+# =============================================================================
+
+# --- Edition ---
+# Must match the edition in Cargo.toml
+edition       = "2024"
+style_edition = "2024"
+
+# --- Layout ---
+max_width     = 100    # Maximum line width
+tab_spaces    = 2      # Spaces per indentation level (2 is common in Rust)
+hard_tabs     = false  # Use spaces, not tabs
+newline_style = "Unix" # LF line endings (use "Windows" for CRLF)
+
+# --- Imports ---
+# How imports are organized and formatted
+group_imports       = "StdExternalCrate" # Group: std, external, crate
+reorder_imports     = true               # Sort imports alphabetically
+reorder_modules     = true               # Sort mod declarations
+imports_granularity = "Crate"            # Merge imports per crate
+imports_indent      = "Block"            # Indent style for imports
+imports_layout      = "Mixed"            # Mixed single/multi-line imports
+
+# --- Expressions ---
+binop_separator         = "Front" # Place binary operators at start of line
+combine_control_expr    = true    # Combine control flow expressions
+overflow_delimited_expr = true    # Allow overflow for delimited expressions
+remove_nested_parens    = true    # Remove unnecessary parentheses
+
+# --- Structures ---
+struct_lit_single_line       = true # Allow single-line struct literals
+struct_lit_width             = 50   # Max width for single-line struct literals
+struct_field_align_threshold = 30   # Align struct fields up to this difference
+enum_discrim_align_threshold = 30   # Align enum discriminants
+
+# --- Functions ---
+fn_params_layout = "Vertical" # Function params on separate lines
+fn_single_line   = false      # Don't put functions on single line
+
+# --- Control Flow ---
+brace_style            = "PreferSameLine" # Opening brace on same line
+control_brace_style    = "AlwaysSameLine"
+empty_item_single_line = true             # Empty items on single line
+force_multiline_blocks = false            # Don't force multiline blocks
+
+# --- Match Expressions ---
+match_arm_blocks           = true     # Use blocks for match arms
+match_arm_leading_pipes    = "Always" # Always use leading pipe in match arms
+match_block_trailing_comma = true     # Trailing comma in match blocks
+
+# --- Comments & Documentation ---
+comment_width                = 80   # Max comment width
+wrap_comments                = true # Wrap long comments
+normalize_comments           = true # Normalize comment formatting
+normalize_doc_attributes     = true # Normalize doc attributes
+format_code_in_doc_comments  = true # Format code blocks in docs
+doc_comment_code_block_width = 100  # Width for code in docs
+
+# --- Macros ---
+format_macro_matchers = true # Format macro matchers
+format_macro_bodies   = true # Format macro bodies
+
+# --- Whitespace ---
+blank_lines_lower_bound = 0          # Minimum blank lines between items
+blank_lines_upper_bound = 1          # Maximum blank lines between items
+trailing_comma          = "Vertical" # Add trailing commas in vertical layouts
+trailing_semicolon      = true       # Keep trailing semicolons
+space_after_colon       = true       # Space after colons
+space_before_colon      = false      # No space before colons
+spaces_around_ranges    = false      # No spaces around range operators
+
+# --- Other ---
+reorder_impl_items         = true    # Reorder items in impl blocks
+merge_derives              = true    # Merge multiple derive attributes
+use_field_init_shorthand   = false   # Don't use field init shorthand
+use_try_shorthand          = true    # Use ? operator shorthand
+force_explicit_abi         = true    # Require explicit ABI in extern blocks
+format_strings             = true    # Format string literals
+format_generated_files     = true    # Format generated files
+hex_literal_case           = "Lower" # Lowercase hex literals
+condense_wildcard_suffixes = true    # Condense wildcard suffixes
+where_single_line          = false   # Where clauses on multiple lines
+
+# --- Unstable Features ---
+# These require `cargo +nightly fmt`. Remove this section to use stable rustfmt.
+unstable_features                   = true
+color                               = "Always"
+show_parse_errors                   = true
+error_on_line_overflow              = false     # Don't error on long lines
+error_on_unformatted                = false     # Don't error on unformatted code
+type_punctuation_density            = "Wide"    # Spacing in type punctuation
+inline_attribute_width              = 0         # Inline attribute width threshold
+short_array_element_width_threshold = 10
+use_small_heuristics                = "Default" # Use default heuristics for formatting
+skip_children                       = false     # Don't skip child modules
+disable_all_formatting              = false     # Don't disable formatting

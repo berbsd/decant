@@ -1,0 +1,79 @@
+# =============================================================================
+# Cargo Configuration
+# =============================================================================
+# Local cargo settings for this workspace.
+# Documentation: https://doc.rust-lang.org/cargo/reference/config.html
+#
+# This file configures:
+# - Command aliases for common operations
+# - Build settings (rustdoc flags, rustc flags)
+# - Platform-specific linker settings (commented out by default)
+# =============================================================================
+
+# =============================================================================
+# Command Aliases
+# =============================================================================
+# Use with: cargo <alias> (e.g., `cargo cl` runs clippy)
+# Add your own aliases as needed.
+
+# Project rule: build/check/clippy always run with --all-targets --all-features
+# (covers benches, examples, tests, and all feature gates). Aliases below enforce this.
+# When invoking the full subcommand directly, pass the flags explicitly.
+[alias]
+b     = "build --all-targets --all-features"  # cargo b  = cargo build (full)
+c     = "check --all-targets --all-features"  # cargo c  = cargo check (full)
+cl    = "clippy --all-targets --all-features" # cargo cl = full clippy
+cov   = "llvm-cov --html"                     # cargo cov = coverage report
+d     = "doc --open"                          # cargo d  = open docs
+nt    = "nextest run"                         # cargo nt = fast test runner
+r     = "run"                                 # cargo r  = cargo run
+t     = "test"                                # cargo t  = cargo test
+audit = "audit --deny warnings"               # cargo audit = security check
+
+# Safe build: explicit panic checks (redundant with workspace lints but useful for CI)
+safe-build = [
+  "clippy",
+  "--",
+  "-D",
+  "clippy::unwrap_used",
+  "-D",
+  "clippy::expect_used",
+  "-D",
+  "clippy::panic",
+  "-D",
+  "clippy::unimplemented",
+  "-D",
+  "clippy::todo",
+]
+
+# =============================================================================
+# Build Settings
+# =============================================================================
+
+[build]
+# Treat rustdoc warnings as errors (catches broken doc links, etc.)
+rustdocflags = ["-D", "warnings"]
+
+# Uncomment to enable tokio's unstable features (console, task dumps, etc.)
+# rustflags = ["--cfg", "tokio_unstable"]
+
+# =============================================================================
+# Platform-Specific Linker Settings
+# =============================================================================
+# Uncomment the appropriate section for faster linking on your platform.
+# Requires installing the linker: mold (Linux) or zld (macOS)
+
+# --- Linux with mold linker (much faster than default ld) ---
+# Install: sudo apt install mold  OR  cargo install mold
+# [target.x86_64-unknown-linux-gnu]
+# linker = "clang"
+# rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+
+# --- macOS with zld linker (faster than default ld64) ---
+# Install: brew install michaeleisel/zld/zld
+# [target.aarch64-apple-darwin]
+# rustflags = ["-C", "link-arg=-fuse-ld=/opt/homebrew/bin/zld"]
+
+# --- macOS Intel with zld ---
+# [target.x86_64-apple-darwin]
+# rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/bin/zld"]

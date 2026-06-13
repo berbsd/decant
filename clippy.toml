@@ -1,0 +1,20 @@
+# Clippy configuration shared across the workspace.
+#
+# Lint *levels* (warn/deny/allow) live in `Cargo.toml` under
+# `[workspace.lints.clippy]`. This file only configures lint *thresholds* and
+# behaviour for lints whose level is set elsewhere.
+
+# Function size cap. CLAUDE.md asks contributors to "aim under ~50 lines" of
+# effective body; raw-source-line equivalent is around 80 once blank lines and
+# braces are counted. Default is 100. Tighter than default forces decomposition
+# while leaving headroom for orchestrator functions.
+too-many-lines-threshold = 80
+
+# Function argument cap. Default is 7. Holding the line at 7 surfaces helper
+# structs ("parameter objects") instead of long signatures.
+too-many-arguments-threshold = 7
+
+# Cognitive complexity cap. Default is 25. Holding the line at 25 keeps the
+# threshold loose enough to allow legitimate state machines while flagging
+# nested branching that wants to be split.
+cognitive-complexity-threshold = 25

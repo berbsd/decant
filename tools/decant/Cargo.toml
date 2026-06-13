@@ -1,0 +1,23 @@
+[package]
+name              = "decant"
+description       = "CLI that reduces a command's output to save LLM tokens"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+readme            = "README.md"
+version.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "decant"
+path = "src/main.rs"
+
+[dependencies]
+anyhow            = { workspace = true }
+clap              = { workspace = true, features = ["derive"] }
+decant-core       = { path = "../../crates/decant-core" }
+decant-metrics    = { path = "../../crates/decant-metrics" }
+decant-transforms = { path = "../../crates/decant-transforms" }
