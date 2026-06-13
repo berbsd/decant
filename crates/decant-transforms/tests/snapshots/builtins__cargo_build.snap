@@ -1,0 +1,7 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 28
+expression: text
+---
+    Blocking waiting for file lock on artifact directory
+31 crates compiled

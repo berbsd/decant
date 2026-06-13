@@ -13,3 +13,11 @@ workspace = true
 
 [dependencies]
 decant-core = { path = "../decant-core" }
+include_dir = { workspace = true }
+regex       = { workspace = true }
+serde       = { workspace = true, features = ["derive"] }
+thiserror   = { workspace = true }
+toml        = { workspace = true }
+
+[dev-dependencies]
+insta = { workspace = true }

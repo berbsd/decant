@@ -10,7 +10,7 @@ use anyhow::Context;
 use clap::Args;
 use decant_core::{CaptureRunner, TimeoutKind, execute};
 use decant_metrics::measure;
-use decant_transforms::Identity;
+use decant_transforms::{Resolved, resolve};
 
 #[derive(Args)]
 pub struct RunArgs {
@@ -25,6 +25,10 @@ pub struct RunArgs {
   /// Suppress the reduction-stats line on stderr.
   #[arg(long)]
   no_stats: bool,
+
+  /// Bypass all transforms and emit the command's raw output.
+  #[arg(long)]
+  raw: bool,
 
   /// The command and its arguments (everything after the flags).
   #[arg(trailing_var_arg = true, required = true)]
@@ -68,13 +72,29 @@ fn stats_line(m: &decant_metrics::Measurement) -> String {
   )
 }
 
-/// Execute the `run` subcommand. Returns the process exit status to surface.
+/// Execute the `run` subcommand, returning the child's exit status.
+///
+/// Spawns the command, captures its output via [`CaptureRunner`], applies the
+/// resolved transform chain, and writes reduced bytes to stdout/stderr. A
+/// stats line is printed to stderr unless `--no-stats` was given.
+///
+/// # Errors
+///
+/// Returns an error if the command argument list is empty (should not happen
+/// given `required = true` on the clap field) or if writing to stdout/stderr
+/// fails.  Spawn failures from the child command are also propagated as errors.
 pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
-  let RunArgs { idle_timeout, wall_timeout, no_stats, command } = args;
+  let RunArgs { idle_timeout, wall_timeout, no_stats, raw, command } = args;
 
   let (program, rest) = command
     .split_first()
     .context("no command given to `decant run`")?;
+
+  let resolved = if raw {
+    Resolved::identity()
+  } else {
+    resolve(&command)
+  };
 
   let mut cmd = Command::new(program);
   cmd.args(rest);
@@ -82,7 +102,7 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
   let runner = CaptureRunner::new(opt_secs(idle_timeout), opt_secs(wall_timeout));
 
   let start = Instant::now();
-  let (output, captured) = execute(cmd, &runner, &Identity)?;
+  let (output, captured) = execute(cmd, &runner, &resolved.chain)?;
   let elapsed = start.elapsed();
 
   // Emit via std::io::Write (not println!) — raw bytes, no UTF-8/newline

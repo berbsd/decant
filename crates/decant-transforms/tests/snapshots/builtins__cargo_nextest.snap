@@ -1,0 +1,6 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+expression: text
+---
+    Starting 45 tests across 7 binaries
+     Summary [   1.600s] 45 tests run: 45 passed, 0 skipped

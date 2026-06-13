@@ -1,8 +1,22 @@
-//! decant library: the CLI logic, exposed so it can be exercised by tests.
-//! The binary (`src/main.rs`) is a thin wrapper around [`run_cli`].
+//! CLI logic for `decant`, exposed as a library so integration tests can drive
+//! the real implementation without going through argv.
+//!
+//! The binary (`src/main.rs`) is a one-liner that calls [`run_cli`].
+//!
+//! # Entry points
+//!
+//! | Function | Purpose |
+//! |----------|---------|
+//! | [`run_cli`] | Parse `std::env::args`, dispatch, return [`ExitCode`]. |
+//! | [`dispatch`] | Same, but takes an already-parsed [`Cli`] — used by tests. |
+//! | [`run::run`] | Execute the `run` subcommand (spawn child, reduce, emit). |
+//! | [`explain::run`] | Execute the `explain` subcommand (show chain, no spawn). |
+//!
+//! [`ExitCode`]: std::process::ExitCode
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod cli;
+pub mod explain;
 pub mod run;
 
 use std::{io::Write, process::ExitCode};
@@ -11,18 +25,24 @@ use clap::Parser;
 pub use cli::{Cli, Commands};
 pub use run::{RunArgs, run};
 
-/// Parse argv, dispatch, and map errors to an exit status.
+/// Parse `std::env::args`, dispatch the subcommand, and return an exit code.
+///
+/// Any error returned by the subcommand is printed to stderr; the function
+/// always returns a valid [`ExitCode`] rather than panicking.
 #[must_use]
 pub fn run_cli() -> ExitCode {
   dispatch(Cli::parse())
 }
 
-/// Dispatch an already-parsed [`Cli`]. Lets tests bypass argv parsing and drive
-/// the real logic with a constructed command line.
+/// Dispatch an already-parsed [`Cli`], returning the appropriate exit code.
+///
+/// Separating parsing from dispatch allows tests to construct a [`Cli`]
+/// directly and exercise the real logic without touching argv.
 #[must_use]
 pub fn dispatch(cli: Cli) -> ExitCode {
   let result = match cli.command {
     | Commands::Run(args) => run::run(args),
+    | Commands::Explain(ref args) => explain::run(args),
   };
   match result {
     | Ok(code) => code,

@@ -36,3 +36,18 @@ fn idle_timeout_kills_and_returns_124() {
   let stderr = String::from_utf8_lossy(&out.stderr);
   assert!(stderr.contains("idle timeout"), "stderr was: {stderr}");
 }
+
+#[test]
+fn explain_lists_builtin_chain() {
+  let out = decant()
+    .args(["explain", "--", "cargo", "build"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  let stdout = String::from_utf8_lossy(&out.stdout);
+  assert!(
+    stdout.contains("built-in cargo-build"),
+    "stdout was: {stdout}"
+  );
+  assert!(stdout.contains("collapse"), "stdout was: {stdout}");
+}

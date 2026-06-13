@@ -1,9 +1,9 @@
 [package]
-name              = "decant"
-description       = "CLI that reduces a command's output to save LLM tokens"
 authors.workspace = true
+description       = "CLI that reduces a command's output to save LLM tokens"
 edition.workspace = true
 license.workspace = true
+name              = "decant"
 publish.workspace = true
 readme            = "README.md"
 version.workspace = true

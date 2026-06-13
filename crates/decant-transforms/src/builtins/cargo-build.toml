@@ -1,0 +1,16 @@
+[[step]]
+type = "strip_ansi"
+
+[[step]]
+type    = "collapse"
+pattern = '^\s*Compiling '
+label   = "{n} crates compiled"
+
+[[step]]
+type    = "drop"
+pattern = '^\s*Finished '
+
+[[step]]
+type      = "truncate"
+max_lines = 100
+keep      = "tail"

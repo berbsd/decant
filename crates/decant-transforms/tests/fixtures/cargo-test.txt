@@ -1,0 +1,108 @@
+
+running 3 tests
+test run::tests::opt_secs_zero_disables_and_nonzero_enables ... ok
+test run::tests::stats_line_reports_savings ... ok
+test run::tests::timeout_marker_formats_idle_and_wall ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test propagates_child_exit_code ... ok
+test passthrough_emits_stdout_and_zero_exit ... ok
+test idle_timeout_kills_and_returns_124 ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s
+
+
+running 11 tests
+test pipeline::tests::applies_transform_on_clean_exit ... ok
+test pipeline::tests::default_transform_mode_is_buffered ... ok
+test pipeline::tests::skips_transform_on_timeout ... ok
+test capture::tests::spawn_failure_is_an_error ... ok
+test capture::tests::propagates_nonzero_exit_code ... ok
+test capture::tests::signal_death_reports_128_plus_signal ... ok
+test capture::tests::captures_stderr ... ok
+test capture::tests::large_output_does_not_deadlock ... ok
+test capture::tests::captures_stdout_on_clean_exit ... ok
+test capture::tests::idle_timeout_fires_and_returns_124 ... ok
+test capture::tests::child_that_closes_pipes_early_is_not_idle_killed ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+
+running 4 tests
+test tests::estimate_tokens_counts_whitespace_words ... ok
+test tests::measure_populates_all_fields ... ok
+test tests::savings_pct_is_fifty_for_half ... ok
+test tests::savings_pct_is_zero_for_empty_input ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 22 tests
+test router::tests::skips_leading_flags_for_subcommand ... ok
+test chain::tests::passthrough_preserves_raw_bytes ... ok
+test chain::tests::describe_lists_each_step ... ok
+test rules::dedup::tests::dedup_collapses_consecutive_duplicates ... ok
+test router::tests::unknown_command_is_identity ... ok
+test router::tests::derives_program_subcommand_key ... ok
+test config::tests::rejects_malformed_toml ... ok
+test config::tests::truncate_keep_defaults_to_tail ... ok
+test config::tests::rejects_invalid_regex ... ok
+test rules::truncate::tests::truncate_head_keeps_first_and_marks_omitted ... ok
+test rules::collapse::tests::collapse_counts_and_substitutes ... ok
+test rules::keep::tests::keep_retains_only_matching_lines ... ok
+test rules::drop::tests::drop_removes_matching_lines ... ok
+test rules::keep_after::tests::keep_after_drops_until_first_match ... ok
+test config::tests::compiles_a_valid_chain ... ok
+test rules::truncate::tests::truncate_tail_keeps_last_and_marks_omitted ... ok
+test rules::truncate::tests::truncate_under_limit_is_unchanged ... ok
+test tests::identity_passes_stdout_and_stderr_through ... ok
+test tests::identity_reports_its_name ... ok
+test chain::tests::chain_applies_rules_in_order ... ok
+test router::tests::resolves_builtin_cargo_build ... ok
+test rules::strip_ansi::tests::strip_ansi_removes_color_codes ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+[1m[92m   Compiling[0m decant-metrics v0.1.0 (/Users/david/github/decant/crates/decant-metrics)
+[1m[92m   Compiling[0m decant-core v0.1.0 (/Users/david/github/decant/crates/decant-core)
+[1m[92m   Compiling[0m decant-transforms v0.1.0 (/Users/david/github/decant/crates/decant-transforms)
+[1m[92m   Compiling[0m decant v0.1.0 (/Users/david/github/decant/tools/decant)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`test` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.42s
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/decant-8dd35f23bf50d2e4)
+[1m[92m     Running[0m unittests src/main.rs (target/debug/deps/decant-238dd598ccca6042)
+[1m[92m     Running[0m tests/cli.rs (target/debug/deps/cli-a611e0642988e907)
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/decant_core-717260dace09872c)
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/decant_metrics-a4f4b8b9d5bd4cae)
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/decant_transforms-c47963026aadc61d)
+[1m[92m   Doc-tests[0m decant
+[1m[92m   Doc-tests[0m decant_core
+[1m[92m   Doc-tests[0m decant_metrics
+[1m[92m   Doc-tests[0m decant_transforms

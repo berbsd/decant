@@ -1,0 +1,52 @@
+   Compiling decant-transforms v0.1.0 (/Users/david/github/decant/crates/decant-transforms)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.36s
+────────────
+ Nextest run ID fc7ffe2c-73a1-477c-8d41-76d526272a11 with nextest profile: default
+    Starting 45 tests across 7 binaries
+        PASS [   0.012s] decant-core pipeline::tests::applies_transform_on_clean_exit
+        PASS [   0.014s] decant run::tests::stats_line_reports_savings
+        PASS [   0.012s] decant run::tests::timeout_marker_formats_idle_and_wall
+        PASS [   0.012s] decant run::tests::opt_secs_zero_disables_and_nonzero_enables
+        PASS [   0.014s] decant-core capture::tests::spawn_failure_is_an_error
+        PASS [   0.012s] decant-core pipeline::tests::default_transform_mode_is_buffered
+        PASS [   0.008s] decant-metrics tests::estimate_tokens_counts_whitespace_words
+        PASS [   0.008s] decant-core pipeline::tests::skips_transform_on_timeout
+        PASS [   0.008s] decant-metrics tests::measure_populates_all_fields
+        PASS [   0.008s] decant-metrics tests::savings_pct_is_zero_for_empty_input
+        PASS [   0.009s] decant-metrics tests::savings_pct_is_fifty_for_half
+        PASS [   0.010s] decant-transforms chain::tests::chain_applies_rules_in_order
+        PASS [   0.008s] decant-transforms chain::tests::passthrough_preserves_raw_bytes
+        PASS [   0.008s] decant-transforms chain::tests::describe_lists_each_step
+        PASS [   0.008s] decant-transforms config::tests::rejects_invalid_regex
+        PASS [   0.007s] decant-transforms config::tests::rejects_malformed_toml
+        PASS [   0.008s] decant-transforms config::tests::compiles_a_valid_chain
+        PASS [   0.007s] decant-transforms config::tests::truncate_keep_defaults_to_tail
+        PASS [   0.006s] decant-transforms router::tests::derives_program_subcommand_key
+        PASS [   0.006s] decant-transforms router::tests::skips_leading_flags_for_subcommand
+        PASS [   0.006s] decant-transforms rules::collapse::tests::collapse_counts_and_substitutes
+        PASS [   0.006s] decant-transforms router::tests::unknown_command_is_identity
+        PASS [   0.006s] decant-transforms rules::dedup::tests::dedup_collapses_consecutive_duplicates
+        PASS [   0.008s] decant-transforms router::tests::resolves_builtin_cargo_build
+        PASS [   0.006s] decant-transforms rules::truncate::tests::truncate_head_keeps_first_and_marks_omitted
+        PASS [   0.007s] decant-transforms rules::keep::tests::keep_retains_only_matching_lines
+        PASS [   0.006s] decant-transforms rules::keep_after::tests::keep_after_drops_until_first_match
+        PASS [   0.006s] decant-transforms rules::strip_ansi::tests::strip_ansi_removes_color_codes
+        PASS [   0.007s] decant-transforms rules::drop::tests::drop_removes_matching_lines
+        PASS [   0.006s] decant-transforms rules::truncate::tests::truncate_tail_keeps_last_and_marks_omitted
+        PASS [   0.006s] decant-transforms tests::identity_passes_stdout_and_stderr_through
+        PASS [   0.006s] decant-transforms rules::truncate::tests::truncate_under_limit_is_unchanged
+        PASS [   0.006s] decant-transforms tests::identity_reports_its_name
+        PASS [   0.019s] decant-transforms::builtins cargo_build_chain_saves_at_least_60pct
+        PASS [   0.020s] decant-transforms::builtins cargo_test_chain_saves_at_least_60pct
+        PASS [   0.119s] decant-core capture::tests::propagates_nonzero_exit_code
+        PASS [   0.118s] decant-core capture::tests::signal_death_reports_128_plus_signal
+        PASS [   0.123s] decant-core capture::tests::captures_stdout_on_clean_exit
+        PASS [   0.123s] decant-core capture::tests::captures_stderr
+        PASS [   0.125s] decant-core capture::tests::large_output_does_not_deadlock
+        PASS [   0.456s] decant::cli propagates_child_exit_code
+        PASS [   0.456s] decant::cli passthrough_emits_stdout_and_zero_exit
+        PASS [   0.528s] decant-core capture::tests::idle_timeout_fires_and_returns_124
+        PASS [   0.628s] decant-core capture::tests::child_that_closes_pipes_early_is_not_idle_killed
+        PASS [   1.599s] decant::cli idle_timeout_kills_and_returns_124
+────────────
+     Summary [   1.600s] 45 tests run: 45 passed, 0 skipped
