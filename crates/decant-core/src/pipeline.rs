@@ -9,12 +9,17 @@ use crate::{
   types::{Captured, TransformOutput},
 };
 
-/// Run `cmd` via `runner`, then transform the output.
+/// Run `cmd` via `runner`, then apply `transform` to the captured output.
 ///
-/// Fallback principle: the transform runs **only** when the child exited
-/// naturally. On timeout (`captured.timeout.is_some()`, partial buffer) the raw
-/// output is returned untouched — a `Buffered` transform would misread an
-/// incomplete buffer.
+/// The transform runs **only** when the child exited naturally (no timeout).
+/// On timeout the raw, possibly-partial buffer is returned untouched — a
+/// [`TransformMode::Buffered`](crate::TransformMode::Buffered) transform would
+/// misread an incomplete buffer.
+///
+/// # Errors
+///
+/// Returns [`RunError::Spawn`] if the child process could not be started, or
+/// [`RunError::Io`] if an I/O error occurs while draining its output.
 pub fn execute(
   cmd: Command,
   runner: &dyn Runner,

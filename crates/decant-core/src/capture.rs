@@ -36,6 +36,9 @@ pub struct CaptureRunner {
 
 impl CaptureRunner {
   /// Construct with explicit timeouts (`None` disables a given timeout).
+  ///
+  /// Pass `None` for either parameter to run without that limit. Both
+  /// can be disabled simultaneously for an unbounded capture.
   #[must_use]
   pub fn new(
     idle_timeout: Option<Duration>,
