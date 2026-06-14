@@ -36,7 +36,7 @@ pub mod router;
 pub mod rule;
 pub mod rules;
 
-pub use chain::RuleChain;
+pub use chain::{PipeSafe, RuleChain};
 pub use config::ConfigError;
 pub use router::{ConfigSource, Resolved, builtin_keys, resolve};
 pub use rule::Rule;

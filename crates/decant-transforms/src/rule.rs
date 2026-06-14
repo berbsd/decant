@@ -26,6 +26,18 @@ pub trait Rule: std::fmt::Debug {
   ) -> String;
   /// Short, human-readable summary shown by `decant explain`.
   fn describe(&self) -> String;
+
+  /// Whether this rule preserves every input line's content, so a downstream
+  /// consumer (e.g. `grep`) still sees the same matches. Rules that drop,
+  /// collapse, or truncate lines return `false` and are skipped in pipe-safe
+  /// mode (see [`crate::RuleChain::run_pipe_safe`]).
+  ///
+  /// Defaults to `false`: a new rule is assumed lossy until it proves
+  /// otherwise, so adding one can never silently hide piped output from a
+  /// downstream filter.
+  fn preserves_lines(&self) -> bool {
+    false
+  }
 }
 
 /// Join lines back into text, terminating non-empty output with a newline.

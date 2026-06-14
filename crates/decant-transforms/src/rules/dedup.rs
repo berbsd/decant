@@ -23,6 +23,12 @@ impl Rule for Dedup {
   fn describe(&self) -> String {
     "dedup".to_string()
   }
+
+  // Consecutive duplicates collapse to a single copy, so any line a `grep`
+  // would match still appears (once) in the output.
+  fn preserves_lines(&self) -> bool {
+    true
+  }
 }
 
 #[cfg(test)]
@@ -32,5 +38,10 @@ mod tests {
   #[test]
   fn dedup_collapses_consecutive_duplicates() {
     assert_eq!(Dedup.apply("a\na\nb\nb\nb\na"), "a\nb\na\n");
+  }
+
+  #[test]
+  fn dedup_is_pipe_safe() {
+    assert!(Dedup.preserves_lines());
   }
 }

@@ -44,4 +44,9 @@ mod tests {
       "fail b\n"
     );
   }
+
+  #[test]
+  fn drop_is_not_pipe_safe() {
+    assert!(!Drop(Regex::new("x").expect("re")).preserves_lines());
+  }
 }

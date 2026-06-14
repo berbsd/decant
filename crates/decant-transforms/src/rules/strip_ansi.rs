@@ -26,6 +26,12 @@ impl Rule for StripAnsi {
   fn describe(&self) -> String {
     "strip_ansi".to_string()
   }
+
+  // Only escape sequences are removed; every line and all its visible text
+  // survive, so a downstream `grep` is unaffected (in fact made more reliable).
+  fn preserves_lines(&self) -> bool {
+    true
+  }
 }
 
 #[cfg(test)]
@@ -35,5 +41,10 @@ mod tests {
   #[test]
   fn strip_ansi_removes_color_codes() {
     assert_eq!(StripAnsi.apply("\x1b[32mok\x1b[0m done"), "ok done");
+  }
+
+  #[test]
+  fn strip_ansi_is_pipe_safe() {
+    assert!(StripAnsi.preserves_lines());
   }
 }

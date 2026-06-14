@@ -1,7 +1,7 @@
 //! `decant run` — execute a command and emit reduced output.
 
 use std::{
-  io::Write,
+  io::{IsTerminal, Write},
   process::{Command, ExitCode},
   time::{Duration, Instant},
 };
@@ -11,7 +11,7 @@ use clap::Args;
 use decant_core::{CaptureRunner, TimeoutKind, execute};
 use decant_metrics::measure;
 use decant_store::{ConfigKind, RunRecord};
-use decant_transforms::{ConfigSource, Resolved, resolve};
+use decant_transforms::{ConfigSource, PipeSafe, Resolved, resolve};
 
 #[derive(Args)]
 pub struct RunArgs {
@@ -31,9 +31,46 @@ pub struct RunArgs {
   #[arg(long)]
   raw: bool,
 
+  /// Force reduction even when stdout is piped or redirected (e.g. into a
+  /// pager). By default decant only reduces for an interactive terminal.
+  #[arg(long, conflicts_with = "raw")]
+  reduce: bool,
+
   /// The command and its arguments (everything after the flags).
   #[arg(trailing_var_arg = true, required = true)]
   command: Vec<String>,
+}
+
+/// How to treat the child's output.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum OutputMode {
+  /// Emit the command's output untouched.
+  Raw,
+  /// Apply only line-preserving rules — safe to pipe into another program.
+  PipeSafe,
+  /// Apply the full transform chain.
+  Full,
+}
+
+/// Choose the output mode from the flags and whether stdout is a terminal.
+///
+/// On an interactive terminal decant applies the full chain. When stdout is a
+/// pipe or file the output feeds another program (e.g. `... | grep foo`), so it
+/// runs only the pipe-safe rules — lossy steps that could hide a downstream
+/// match are skipped. `--raw` forces untouched output; `--reduce` forces the
+/// full chain even when piped (e.g. into a pager).
+fn output_mode(
+  raw: bool,
+  reduce: bool,
+  stdout_is_terminal: bool,
+) -> OutputMode {
+  if raw {
+    OutputMode::Raw
+  } else if reduce || stdout_is_terminal {
+    OutputMode::Full
+  } else {
+    OutputMode::PipeSafe
+  }
 }
 
 fn opt_secs(secs: u64) -> Option<Duration> {
@@ -94,13 +131,21 @@ fn config_kind(source: &ConfigSource) -> ConfigKind {
 /// given `required = true` on the clap field) or if writing to stdout/stderr
 /// fails.  Spawn failures from the child command are also propagated as errors.
 pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
-  let RunArgs { idle_timeout, wall_timeout, no_stats, raw, command } = args;
+  let RunArgs {
+    idle_timeout,
+    wall_timeout,
+    no_stats,
+    raw,
+    reduce,
+    command,
+  } = args;
 
   let (program, rest) = command
     .split_first()
     .context("no command given to `decant run`")?;
 
-  let resolved = if raw {
+  let mode = output_mode(raw, reduce, std::io::stdout().is_terminal());
+  let resolved = if mode == OutputMode::Raw {
     Resolved::identity()
   } else {
     resolve(&command)
@@ -112,7 +157,10 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
   let runner = CaptureRunner::new(opt_secs(idle_timeout), opt_secs(wall_timeout));
 
   let start = Instant::now();
-  let (output, captured) = execute(cmd, &runner, &resolved.chain)?;
+  let (output, captured) = match mode {
+    | OutputMode::PipeSafe => execute(cmd, &runner, &PipeSafe(&resolved.chain))?,
+    | OutputMode::Raw | OutputMode::Full => execute(cmd, &runner, &resolved.chain)?,
+  };
   let elapsed = start.elapsed();
 
   // Emit via std::io::Write (not println!) — raw bytes, no UTF-8/newline
@@ -133,7 +181,9 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
   let reduced_bytes = [output.stdout.as_slice(), output.stderr.as_slice()].concat();
   let m = measure(&raw_bytes, &reduced_bytes, elapsed);
 
-  if !no_stats {
+  // Raw mode runs no transform, so "0.0% saved" would be noise. PipeSafe and
+  // Full both reduce, so their stats are meaningful.
+  if !no_stats && mode != OutputMode::Raw {
     writeln!(err, "{}", stats_line(&m))?;
   }
   err.flush()?;
@@ -170,6 +220,22 @@ mod tests {
   fn opt_secs_zero_disables_and_nonzero_enables() {
     assert_eq!(opt_secs(0), None);
     assert_eq!(opt_secs(1), Some(Duration::from_secs(1)));
+  }
+
+  #[test]
+  fn output_mode_follows_terminal_by_default() {
+    // Terminal → full reduction; piped → pipe-safe (lossless) reduction only.
+    assert_eq!(output_mode(false, false, true), OutputMode::Full);
+    assert_eq!(output_mode(false, false, false), OutputMode::PipeSafe);
+  }
+
+  #[test]
+  fn output_mode_flags_override_terminal_state() {
+    // --raw forces untouched output, even on a terminal.
+    assert_eq!(output_mode(true, false, true), OutputMode::Raw);
+    assert_eq!(output_mode(true, false, false), OutputMode::Raw);
+    // --reduce forces the full chain even when piped (the `| less` case).
+    assert_eq!(output_mode(false, true, false), OutputMode::Full);
   }
 
   #[test]
