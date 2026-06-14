@@ -1,0 +1,19 @@
+[package]
+name              = "decant-store"
+description       = "SQLite persistence of decant run metrics"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+readme            = "README.md"
+version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+decant-metrics = { path = "../decant-metrics" }
+
+anyhow         = { workspace = true }
+rusqlite       = { workspace = true }
+serde          = { workspace = true, features = ["derive"] }
