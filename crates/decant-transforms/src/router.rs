@@ -6,6 +6,7 @@
 //! printed to stderr and also fall back to identity — output is never blocked.
 
 use std::{
+  collections::BTreeMap,
   fmt,
   path::{Path, PathBuf},
   sync::LazyLock,
@@ -74,31 +75,30 @@ impl Resolved {
   }
 }
 
-/// Sorted keys of every embedded built-in (filename without the `.toml`),
-/// for `decant explain` with no args.
-static BUILTIN_KEYS: LazyLock<Vec<String>> = LazyLock::new(|| {
-  let mut keys: Vec<String> = BUILTINS
+/// Every embedded built-in, keyed by filename without the `.toml` suffix.
+///
+/// A [`BTreeMap`] serves both access patterns from one structure: O(log n)
+/// content lookup ([`builtin`]) and sorted-key iteration ([`builtin_keys`],
+/// used by `decant explain`). Entries with non-UTF-8 names or contents are
+/// silently skipped.
+static BUILTINS_MAP: LazyLock<BTreeMap<String, &'static str>> = LazyLock::new(|| {
+  BUILTINS
     .files()
     .filter_map(|f| {
-      f.path()
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .map(str::to_string)
+      let key = f.path().file_stem()?.to_str()?.to_string();
+      Some((key, f.contents_utf8()?))
     })
-    .collect();
-  keys.sort();
-  keys
+    .collect()
 });
 
-/// Keys of every embedded built-in config.
-#[must_use]
-pub fn builtin_keys() -> &'static [String] {
-  BUILTIN_KEYS.as_slice()
+/// Keys of every embedded built-in config, in sorted order.
+pub fn builtin_keys() -> impl Iterator<Item = &'static str> {
+  BUILTINS_MAP.keys().map(String::as_str)
 }
 
 /// The embedded TOML text for `key`, if a `<key>.toml` built-in exists.
 fn builtin(key: &str) -> Option<&'static str> {
-  BUILTINS.get_file(format!("{key}.toml"))?.contents_utf8()
+  BUILTINS_MAP.get(key).copied()
 }
 
 fn program_of(first: &str) -> &str {
@@ -227,17 +227,53 @@ mod tests {
   fn every_builtin_compiles() {
     // Guards against shipping a built-in with bad TOML or an invalid regex:
     // each embedded config must parse and compile to a real chain.
-    let keys = builtin_keys();
+    let keys: Vec<&str> = builtin_keys().collect();
     assert!(!keys.is_empty(), "no built-ins were embedded");
     for key in keys {
       let text = builtin(key).expect("builtin file exists for its key");
-      let compiled = load_and_compile(text, key.clone());
+      let compiled = load_and_compile(text, key.to_string());
       assert!(
         compiled.is_ok(),
         "built-in `{key}` failed to compile: {:?}",
         compiled.err()
       );
     }
+  }
+
+  #[test]
+  fn cargo_build_pipe_grep_can_lose_matches() {
+    // Simulates `decant run -- cargo build | grep foo`: the shell pipe greps
+    // decant's REDUCED stdout, so anything the cargo-build chain collapses or
+    // truncates becomes invisible to grep.
+    let chain = load_and_compile(
+      builtin("cargo-build").expect("cargo-build builtin exists"),
+      "cargo-build".to_string(),
+    )
+    .expect("cargo-build compiles");
+
+    // Case A — `foo` only appears as a crate name on a `Compiling` line, which
+    // the chain collapses into a count. `grep foo` would now find NOTHING.
+    let raw_a = "   Compiling foo v0.1.0 (/path/to/foo)\n   Compiling bar v0.2.0\n    Finished \
+                 dev [unoptimized] in 1.20s\n";
+    let reduced_a = String::from_utf8_lossy(&chain.run(raw_a.as_bytes())).into_owned();
+    assert!(
+      raw_a.contains("foo"),
+      "raw cargo output really does mention foo"
+    );
+    assert!(
+      !reduced_a.contains("foo"),
+      "BROKEN: `Compiling foo` was collapsed away — grep foo finds nothing.\nreduced:\n{reduced_a}"
+    );
+
+    // Case B — `foo` appears in a diagnostic line the chain leaves untouched.
+    // `grep foo` still works.
+    let raw_b =
+      "   Compiling myapp v0.1.0\nwarning: unused variable: `foo`\n    Finished dev in 0.80s\n";
+    let reduced_b = String::from_utf8_lossy(&chain.run(raw_b.as_bytes())).into_owned();
+    assert!(
+      reduced_b.contains("foo"),
+      "PRESERVED: diagnostics survive — grep foo still works.\nreduced:\n{reduced_b}"
+    );
   }
 
   #[test]
