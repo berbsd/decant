@@ -8,12 +8,18 @@ use decant_store::{HistoryFilter, Summary, summary};
 
 /// Arguments for `decant history`.
 #[derive(Args)]
+#[command(
+  after_long_help = "EXAMPLES:\n  decant history                   Savings across all recorded \
+                     runs\n  decant history --since 7         Only runs from the last 7 days\n  \
+                     decant history --project decant  Only runs from a matching project\n  decant \
+                     history --json            Machine-readable summary"
+)]
 pub struct HistoryArgs {
   /// Only include runs from the last N days.
-  #[arg(long)]
+  #[arg(long, value_name = "DAYS")]
   since:   Option<u64>,
   /// Only include runs whose project name contains this substring.
-  #[arg(long)]
+  #[arg(long, value_name = "SUBSTR")]
   project: Option<String>,
   /// Emit the summary as JSON.
   #[arg(long)]

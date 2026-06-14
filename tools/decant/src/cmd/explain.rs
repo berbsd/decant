@@ -7,10 +7,15 @@ use decant_transforms::{builtin_keys, resolve};
 
 /// Arguments for `decant explain`.
 #[derive(Args)]
+#[command(
+  after_long_help = "EXAMPLES:\n  decant explain -- git status     Show the transform chain for a \
+                     command\n  decant explain                   List every command with a \
+                     built-in config"
+)]
 pub struct ExplainArgs {
   /// The command to explain (everything after the flags). Omit to list all
   /// commands that have a built-in config.
-  #[arg(trailing_var_arg = true)]
+  #[arg(value_name = "COMMAND", trailing_var_arg = true)]
   command: Vec<String>,
 }
 

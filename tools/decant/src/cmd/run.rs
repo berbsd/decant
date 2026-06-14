@@ -14,30 +14,46 @@ use decant_store::{ConfigKind, RunRecord};
 use decant_transforms::{ConfigSource, PipeSafe, Resolved, resolve};
 
 #[derive(Args)]
+#[command(
+  after_long_help = "EXAMPLES:\n  decant run -- cargo build            Reduce build output\n  \
+                     decant run --raw -- git diff         Bypass reduction, emit raw output\n  \
+                     decant run --reduce -- ls | less     Force reduction even when piped\n  \
+                     decant run --timeout 120 -- npm ci   Kill the child after 120s wall-clock"
+)]
 pub struct RunArgs {
   /// Seconds with no output before assuming the command hung (0 disables).
-  #[arg(long, default_value_t = 60)]
+  #[arg(
+    long,
+    value_name = "SECS",
+    default_value_t = 60,
+    help_heading = "Timeouts"
+  )]
   idle_timeout: u64,
 
   /// Wall-clock seconds before forced termination (0 disables).
-  #[arg(long = "timeout", default_value_t = 600)]
+  #[arg(
+    long = "timeout",
+    value_name = "SECS",
+    default_value_t = 600,
+    help_heading = "Timeouts"
+  )]
   wall_timeout: u64,
 
   /// Suppress the reduction-stats line on stderr.
-  #[arg(long)]
+  #[arg(long, help_heading = "Output")]
   no_stats: bool,
 
   /// Bypass all transforms and emit the command's raw output.
-  #[arg(long)]
+  #[arg(long, help_heading = "Output")]
   raw: bool,
 
   /// Force reduction even when stdout is piped or redirected (e.g. into a
   /// pager). By default decant only reduces for an interactive terminal.
-  #[arg(long, conflicts_with = "raw")]
+  #[arg(long, conflicts_with = "raw", help_heading = "Output")]
   reduce: bool,
 
   /// The command and its arguments (everything after the flags).
-  #[arg(trailing_var_arg = true, required = true)]
+  #[arg(value_name = "COMMAND", trailing_var_arg = true, required = true)]
   command: Vec<String>,
 }
 

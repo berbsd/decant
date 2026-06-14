@@ -8,9 +8,15 @@ use decant_agents::{InstallOutcome, Scope, registry};
 
 /// Arguments for `decant init`.
 #[derive(Args)]
+#[command(
+  after_long_help = "EXAMPLES:\n  decant init                  Install the Claude hook globally \
+                     (~/.claude)\n  decant init --project        Install into ./.claude for this \
+                     project only\n  decant init --agent claude   Choose the target agent \
+                     explicitly"
+)]
 pub struct InitArgs {
   /// Agent to install the hook for.
-  #[arg(long, default_value = "claude")]
+  #[arg(long, value_name = "AGENT", default_value = "claude")]
   agent:   String,
   /// Install into the project (`./.claude`) instead of the global config.
   #[arg(long)]

@@ -19,6 +19,10 @@ const STDIN_CAP: u64 = 1024 * 1024;
 #[derive(Args)]
 pub struct HookArgs {
   /// Agent id whose hook protocol to speak (e.g. `claude`).
+  ///
+  /// This subcommand is invoked by the agent itself, via the hook installed by
+  /// `decant init` — you normally never run it by hand.
+  #[arg(value_name = "AGENT")]
   agent: String,
 }
 

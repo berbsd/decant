@@ -17,6 +17,11 @@ const USER_AGENT: &str = "decant-update";
 
 /// Arguments for `decant update`.
 #[derive(Args)]
+#[command(
+  after_long_help = "EXAMPLES:\n  decant update          Download and install the latest \
+                     release\n  decant update --check  Report whether an update is available, \
+                     without installing"
+)]
 pub struct UpdateArgs {
   /// Report whether an update is available without applying it.
   #[arg(long)]
