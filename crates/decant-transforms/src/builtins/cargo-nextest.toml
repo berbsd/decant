@@ -2,25 +2,25 @@
 type = "strip_ansi"
 
 [[step]]
-type = "drop"
+type    = "drop"
 pattern = '^\s*(Compiling|Finished) '
 
 [[step]]
-type = "drop"
+type    = "drop"
 pattern = '^\s*─+\s*$'
 
 [[step]]
-type = "drop"
+type    = "drop"
 pattern = 'Nextest run ID '
 
 [[step]]
-type = "drop"
+type    = "drop"
 pattern = '^\s*PASS '
 
 [[step]]
 type = "dedup"
 
 [[step]]
-type = "truncate"
+type      = "truncate"
 max_lines = 120
-keep = "tail"
+keep      = "tail"
