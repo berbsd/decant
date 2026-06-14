@@ -1,0 +1,38 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 66
+expression: "String::from_utf8_lossy(&out)"
+---
+make: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m1
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+  CC m1_a.o
+  CC m1_b.o
+  CC m1_c.o
+  LD m1.a
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m2
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+  CC m2_a.o
+  CC m2_b.o
+  CC m2_c.o
+  LD m2.a
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m3
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+  CC m3_a.o
+  CC m3_b.o
+  CC m3_c.o
+  LD m3.a
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m4
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+  CC m4_a.o
+  CC m4_b.o
+  CC m4_c.o
+  LD m4.a
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m5
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+  CC m5_a.o
+  CC m5_b.o
+  CC m5_c.o
+  LD m5.a
+==> Final link
+make: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww'

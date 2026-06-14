@@ -1,0 +1,7 @@
+[[step]]
+type = "strip_ansi"
+
+[[step]]
+type      = "truncate"
+max_lines = 60
+keep      = "tail"

@@ -1,0 +1,15 @@
+[[step]]
+type = "strip_ansi"
+
+[[step]]
+type    = "drop"
+pattern = '^make\[\d+\]:'
+
+[[step]]
+type    = "drop"
+pattern = '^\s*$'
+
+[[step]]
+type      = "truncate"
+max_lines = 50
+keep      = "tail"

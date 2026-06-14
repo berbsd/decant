@@ -1,0 +1,15 @@
+[[step]]
+type = "strip_ansi"
+
+[[step]]
+type    = "drop"
+pattern = '^\s*\(use "git'
+
+[[step]]
+type    = "drop"
+pattern = '^\s*$'
+
+[[step]]
+type      = "truncate"
+max_lines = 60
+keep      = "tail"

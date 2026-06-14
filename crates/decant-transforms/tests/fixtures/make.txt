@@ -1,0 +1,53 @@
+make: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m1
+make[1]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m1'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+make[2]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m1/src'
+  CC m1_a.o
+  CC m1_b.o
+  CC m1_c.o
+make[2]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m1/src'
+  LD m1.a
+make[1]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m1'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m2
+make[1]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m2'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+make[2]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m2/src'
+  CC m2_a.o
+  CC m2_b.o
+  CC m2_c.o
+make[2]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m2/src'
+  LD m2.a
+make[1]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m2'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m3
+make[1]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m3'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+make[2]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m3/src'
+  CC m3_a.o
+  CC m3_b.o
+  CC m3_c.o
+make[2]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m3/src'
+  LD m3.a
+make[1]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m3'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m4
+make[1]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m4'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+make[2]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m4/src'
+  CC m4_a.o
+  CC m4_b.o
+  CC m4_c.o
+make[2]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m4/src'
+  LD m4.a
+make[1]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m4'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C m5
+make[1]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m5'
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C src
+make[2]: Entering directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m5/src'
+  CC m5_a.o
+  CC m5_b.o
+  CC m5_c.o
+make[2]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m5/src'
+  LD m5.a
+make[1]: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww/m5'
+==> Final link
+make: Leaving directory `/private/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.y49tR2EWww'

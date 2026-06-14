@@ -1,0 +1,46 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 120
+expression: "String::from_utf8_lossy(&out)"
+---
+… 887 more lines
+-rwxr-xr-x    1 root   wheel    238912 Apr 30 21:33 xprotect
+-rwxr-xr-x    1 root   wheel      2665 Apr 30 21:33 xslt-config
+-rwxr-xr-x    1 root   wheel    137664 Apr 30 21:33 xsltproc
+-rwxr-xr-x    2 root   wheel      5167 Apr 30 21:33 xsubpp
+-rwxr-xr-x    2 root   wheel      5167 Apr 30 21:33 xsubpp5.34
+-rwxr-xr-x    1 root   wheel    135120 Apr 30 21:33 xxd
+lrwxr-xr-x    1 root   wheel         2 Apr 30 21:33 yaa -> aa
+-rwxr-xr-x   78 root   wheel    118928 Apr 30 21:33 yacc
+-r-xr-xr-x    2 root   wheel       553 Apr 30 21:33 yamlpp-events
+-r-xr-xr-x    2 root   wheel       553 Apr 30 21:33 yamlpp-events5.34
+-r-xr-xr-x    2 root   wheel       534 Apr 30 21:33 yamlpp-highlight
+-r-xr-xr-x    2 root   wheel       534 Apr 30 21:33 yamlpp-highlight5.34
+-r-xr-xr-x    2 root   wheel      3039 Apr 30 21:33 yamlpp-load
+-r-xr-xr-x    2 root   wheel      4563 Apr 30 21:33 yamlpp-load-dump
+-r-xr-xr-x    2 root   wheel      4563 Apr 30 21:33 yamlpp-load-dump5.34
+-r-xr-xr-x    2 root   wheel      3039 Apr 30 21:33 yamlpp-load5.34
+-r-xr-xr-x    2 root   wheel      2708 Apr 30 21:33 yamlpp-parse-emit
+-r-xr-xr-x    2 root   wheel      2708 Apr 30 21:33 yamlpp-parse-emit5.34
+-r-xr-xr-x    2 root   wheel      6616 Apr 30 21:33 yapp
+-r-xr-xr-x    2 root   wheel      6616 Apr 30 21:33 yapp5.34
+-rwxr-xr-x    1 root   wheel    100928 Apr 30 21:33 yes
+-rwxr-xr-x    3 root   wheel    197504 Apr 30 21:33 zcat
+-rwxr-xr-x    2 root   wheel      3212 Apr 30 21:33 zcmp
+-rwxr-xr-x    2 root   wheel      3212 Apr 30 21:33 zdiff
+-rwxr-xr-x    4 root   wheel    153760 Apr 30 21:33 zegrep
+-rwxr-xr-x    4 root   wheel    153760 Apr 30 21:33 zfgrep
+-rwxr-xr-x    1 root   wheel      1390 Apr 30 21:33 zforce
+-rwxr-xr-x    4 root   wheel    153760 Apr 30 21:33 zgrep
+-rwxr-xr-x    1 root   wheel    405984 Apr 30 21:33 zip
+-rwxr-xr-x    1 root   wheel    238992 Apr 30 21:33 zipcloak
+-rwxr-xr-x    2 root   wheel     60065 Apr 30 21:33 zipdetails
+-rwxr-xr-x    2 root   wheel     60065 Apr 30 21:33 zipdetails5.34
+-rwxr-xr-x    1 root   wheel      2953 Apr 30 21:33 zipgrep
+-rwxr-xr-x    2 root   wheel    454560 Apr 30 21:33 zipinfo
+-rwxr-xr-x    1 root   wheel    221840 Apr 30 21:33 zipnote
+-rwxr-xr-x    1 root   wheel    238464 Apr 30 21:33 zipsplit
+-rwxr-xr-x    2 root   wheel      2018 Apr 30 21:33 zless
+-rwxr-xr-x    2 root   wheel      2018 Apr 30 21:33 zmore
+-rwxr-xr-x    1 root   wheel      3314 Apr 30 21:33 znew
+-rwxr-xr-x    1 root   wheel    170320 Apr 30 21:33 zprint

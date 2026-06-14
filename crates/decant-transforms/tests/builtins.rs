@@ -56,3 +56,75 @@ fn cargo_nextest_chain_saves_at_least_60pct() {
   let text = String::from_utf8_lossy(&out);
   insta::assert_snapshot!("cargo_nextest", text);
 }
+
+#[test]
+fn make_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/make.txt");
+  let out = run_builtin(&["make"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "make savings only {pct:.1}%");
+  insta::assert_snapshot!("make", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn rsync_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/rsync.txt");
+  let out = run_builtin(&["rsync"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "rsync savings only {pct:.1}%");
+  insta::assert_snapshot!("rsync", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn git_status_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/git-status.txt");
+  let out = run_builtin(&["git", "status"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "git status savings only {pct:.1}%");
+  insta::assert_snapshot!("git_status", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn git_log_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/git-log.txt");
+  let out = run_builtin(&["git", "log"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "git log savings only {pct:.1}%");
+  insta::assert_snapshot!("git_log", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn du_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/du.txt");
+  let out = run_builtin(&["du"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "du savings only {pct:.1}%");
+  insta::assert_snapshot!("du", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn git_diff_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/git-diff.txt");
+  let out = run_builtin(&["git", "diff"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "git diff savings only {pct:.1}%");
+  insta::assert_snapshot!("git_diff", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn ls_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/ls.txt");
+  let out = run_builtin(&["ls"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "ls savings only {pct:.1}%");
+  insta::assert_snapshot!("ls", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn find_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/find.txt");
+  let out = run_builtin(&["find"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "find savings only {pct:.1}%");
+  insta::assert_snapshot!("find", String::from_utf8_lossy(&out));
+}

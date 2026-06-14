@@ -1,0 +1,31 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 102
+expression: "String::from_utf8_lossy(&out)"
+---
+… 160 more lines
+ 80K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir8
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_7.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_6.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_4.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_5.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_1.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_2.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_7.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_6.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_4.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_5.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_1.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_2.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_3.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_10.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_8.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2/file_9.bin
+ 40K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/subdir2
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_3.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_10.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_8.bin
+4.0K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1/file_9.bin
+ 80K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7/subdir1
+ 80K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4/dir7
+640K	/var/folders/tv/ztvx62sj47319914tthr6y040000gn/T/tmp.I58w57bwL4

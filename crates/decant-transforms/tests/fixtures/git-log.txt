@@ -1,0 +1,159 @@
+commit e82840d6a844d933ee3764ad37d87b6379299a0f
+Author: DavidB <berbsd@gmail.com>
+Date:   Sun Jun 14 10:20:59 2026 +0200
+
+    feat(update): add install script and self-update
+    
+    install.sh detects the host arch, downloads the matching release
+    binary, verifies its SHA256, and installs to ~/.local/bin (no sudo).
+    `decant update` fetches the latest release via ureq, verifies the
+    checksum with sha2, and atomically replaces the running binary. A
+    build.rs bakes the target triple so the binary knows which asset to
+    fetch.
+
+commit 120a5bce6b8ff05973028614d9a4aa24200c924a
+Author: DavidB <berbsd@gmail.com>
+Date:   Sun Jun 14 10:20:59 2026 +0200
+
+    chore(release): add release tooling and changelog
+    
+    cargo-release + git-cliff recipes (just release/changelog), a
+    tag-triggered GitHub Actions workflow that cross-builds the four target
+    binaries and publishes them with SHA256 checksums and git-cliff notes,
+    a generated CHANGELOG.md (un-ignored from the blanket **/*.md rule),
+    a pinned cliff.toml remote, and a release runbook in the README.
+
+commit b80592688bb72da9c7642ed8eb2b231bc1ccb0eb
+Author: DavidB <berbsd@gmail.com>
+Date:   Sun Jun 14 10:20:59 2026 +0200
+
+    refactor(errors): migrate library crates to thiserror
+    
+    decant-agents and decant-store were the last library crates using
+    anyhow; they now expose typed errors (AgentError, StoreError) like
+    decant-core and decant-transforms already do. The binary keeps anyhow
+    and converts the typed errors via `?`.
+
+commit d1e6b8d3bd94adac8ef95af66bc11be19e0a7b53
+Author: DavidB <berbsd@gmail.com>
+Date:   Sun Jun 14 09:17:45 2026 +0200
+
+    feat(cli): add init, hook, and history subcommands
+    
+    `decant init [--project]` installs the agent hook (idempotent);
+    `decant hook <agent>` is the runtime processor (stdout-only,
+    passthrough on any error, no auto-approve); `decant history` reports
+    actual reduction per command plus recurring no-config commands. `decant
+    run` now records each run to the metrics store best-effort. Adds
+    black-box CLI tests for hook, init, and history.
+
+commit 6367902614828acb4386daf864b4dfe19b7644e3
+Author: DavidB <berbsd@gmail.com>
+Date:   Sun Jun 14 09:17:45 2026 +0200
+
+    feat(store): add SQLite metrics store crate
+    
+    decant-store persists one row per `decant run` (command, bytes/tokens
+    in and out, duration, config source) and aggregates them for the
+    history report. DB path resolves to $DECANT_DB_PATH, else
+    $XDG_DATA_HOME/decant, else ~/.local/share/decant. Unit-tested
+    in-memory.
+
+commit 2996c9e86b6a5b86074b701226b586578931eb57
+Author: DavidB <berbsd@gmail.com>
+Date:   Sun Jun 14 09:17:45 2026 +0200
+
+    feat(agents): add agent hook integration crate
+    
+    A multi-agent hook seam for routing an agent's commands through
+    `decant run`. The Agent trait (one impl per file) owns per-agent hook
+    concerns; ClaudeAgent is the first impl. An agent-agnostic shell-aware
+    rewriter wraps simple commands (cargo test -> decant run -- cargo test)
+    while passing builtins, pipelines, and redirects through unchanged.
+    settings.json merging is idempotent.
+    
+    Carries this batch's workspace deps: serde_json, tempfile, and rusqlite
+    (used by the metrics store in the next commit).
+
+commit e3cbf3745bcfd0e77560d980bcb218de19405145
+Author: DavidB <berbsd@gmail.com>
+Date:   Sat Jun 13 18:30:53 2026 +0200
+
+    chore: adopt the platform .gitignore
+    
+    Replace the minimal ignore list with the squadri platform's fuller
+    set: credential/secret patterns, IDE and macOS junk, env files, and
+    .claude/ allowlisting. Docs stay ignored via a blanket `**/*.md`
+    rule (README/TODO/CLAUDE excepted), which also silently ignores any
+    new non-README markdown by default.
+
+commit bcd4d77252ba318403994aced936b9631827f8ee
+Author: DavidB <berbsd@gmail.com>
+Date:   Sat Jun 13 18:29:38 2026 +0200
+
+    chore: vendor decant-relevant Claude skills
+    
+    Keep rust-documenter, rust-quality, commit, and find-docs as
+    project skills. Drop the platform/service-oriented skills
+    (rust-tracing-instrument, validate-implementation,
+    env-vars-documenter) — decant is a sync CLI with no tracing or
+    service config — and the generic code-documenter, superseded by
+    rust-documenter for a pure-Rust project.
+
+commit f89deeee7b41c84e360331fe4c61f90ee49f051d
+Author: DavidB <berbsd@gmail.com>
+Date:   Sat Jun 13 16:09:07 2026 +0200
+
+    docs: document decant-core and decant-metrics
+    
+    Add crate- and module-level docs, # Errors sections on the
+    Result-returning APIs, per-variant docs on RunError, and field
+    docs across the foundation crates. Add runnable doc-tests for the
+    metrics functions and enrich the crate READMEs.
+
+commit 2888d13faa799187e03f8e8c43211b51a4195dce
+Author: DavidB <berbsd@gmail.com>
+Date:   Sat Jun 13 16:08:56 2026 +0200
+
+    feat(transforms): add TOML-driven chainable transform system
+    
+    Replace the hardcoded Identity transform with per-command routing.
+    A 7-rule vocabulary (strip_ansi, drop, keep, keep_after, collapse,
+    dedup, truncate) — each a Rule trait impl in its own file under
+    rules/ — composes into a RuleChain via TOML configs. The router
+    resolves the wrapped command's (program, subcommand) to a config
+    (project -> user -> embedded built-in -> identity); built-ins are
+    embedded with include_dir and auto-discovered. The CLI gains
+    routing in `run`, a `--raw` bypass, and an `explain` subcommand.
+    
+    Ships built-ins for cargo build/test/nextest with snapshot and
+    >=60% savings tests against real fixtures. A bad config (invalid
+    TOML or regex) warns and falls back to identity, never blocking
+    output.
+
+commit 41d1a95320827196fd7a6cdf2b74a496da53899c
+Author: DavidB <berbsd@gmail.com>
+Date:   Sat Jun 13 14:08:37 2026 +0200
+
+    feat: scaffold decant workspace with v1 capture pipeline
+    
+    decant wraps a child command, captures its output, transforms it to
+    reduce LLM token usage, and emits the result. This is the v1 foundation:
+    plumbing + trait seams, with an Identity (passthrough) transform.
+    
+    Workspace (edition 2024, resolver 3, toolchain 1.95, conventions from
+    squadri/platform — shared lints, deny/lefthook/taplo/typos/nextest/just/CI):
+    
+    - decant-core: the engine. Runner + Transform trait seams, the execute()
+      pipeline (transform on clean exit, raw passthrough on timeout), and
+      CaptureRunner — a threaded-drain runner with idle + wall-clock timeouts,
+      process-group kill (SIGTERM -> grace -> SIGKILL), 128+signal exit codes,
+      and exit 124 on timeout.
+    - decant-transforms: Identity passthrough (Buffered mode).
+    - decant-metrics: Measurement / savings_pct / token estimation.
+    - tools/decant: lib + thin bin CLI. `decant run -- <cmd>` emits via
+      std::io::Write (raw bytes), stats/markers to stderr, exit code propagated.
+      Logic lives in the library (run_cli/dispatch/run) for testability.
+    
+    23 tests pass (unit + black-box CLI integration); clippy --all-targets clean;
+    cargo deny clean. Design docs are kept local-only (gitignored).

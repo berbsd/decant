@@ -1,0 +1,46 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 93
+expression: "String::from_utf8_lossy(&out)"
+---
+commit e82840d6a844d933ee3764ad37d87b6379299a0f
+Author: DavidB <berbsd@gmail.com>
+    feat(update): add install script and self-update
+    install.sh detects the host arch, downloads the matching release
+    binary, verifies its SHA256, and installs to ~/.local/bin (no sudo).
+    `decant update` fetches the latest release via ureq, verifies the
+    checksum with sha2, and atomically replaces the running binary. A
+    build.rs bakes the target triple so the binary knows which asset to
+    fetch.
+commit 120a5bce6b8ff05973028614d9a4aa24200c924a
+Author: DavidB <berbsd@gmail.com>
+    chore(release): add release tooling and changelog
+    cargo-release + git-cliff recipes (just release/changelog), a
+    tag-triggered GitHub Actions workflow that cross-builds the four target
+    binaries and publishes them with SHA256 checksums and git-cliff notes,
+    a generated CHANGELOG.md (un-ignored from the blanket **/*.md rule),
+    a pinned cliff.toml remote, and a release runbook in the README.
+commit b80592688bb72da9c7642ed8eb2b231bc1ccb0eb
+Author: DavidB <berbsd@gmail.com>
+    refactor(errors): migrate library crates to thiserror
+    decant-agents and decant-store were the last library crates using
+    anyhow; they now expose typed errors (AgentError, StoreError) like
+    decant-core and decant-transforms already do. The binary keeps anyhow
+    and converts the typed errors via `?`.
+commit d1e6b8d3bd94adac8ef95af66bc11be19e0a7b53
+Author: DavidB <berbsd@gmail.com>
+    feat(cli): add init, hook, and history subcommands
+    `decant init [--project]` installs the agent hook (idempotent);
+    `decant hook <agent>` is the runtime processor (stdout-only,
+    passthrough on any error, no auto-approve); `decant history` reports
+    actual reduction per command plus recurring no-config commands. `decant
+    run` now records each run to the metrics store best-effort. Adds
+    black-box CLI tests for hook, init, and history.
+commit 6367902614828acb4386daf864b4dfe19b7644e3
+Author: DavidB <berbsd@gmail.com>
+    feat(store): add SQLite metrics store crate
+    decant-store persists one row per `decant run` (command, bytes/tokens
+    in and out, duration, config source) and aggregates them for the
+    history report. DB path resolves to $DECANT_DB_PATH, else
+    $XDG_DATA_HOME/decant, else ~/.local/share/decant. Unit-tested
+… 71 more lines
