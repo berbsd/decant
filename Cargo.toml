@@ -3,14 +3,12 @@ members  = ["crates/*", "tools/*"]
 resolver = "3"
 
 [workspace.package]
-authors     = ["David <david@squadri.com>"]
-description = "decant — reduce a command's output to save LLM tokens"
-edition     = "2024"
-license     = "MIT"
-publish     = false
-readme      = "README.md"
-repository  = "https://github.com/squadri/decant"
-version     = "0.1.0"
+authors    = ["David <david@squadri.com>"]
+edition    = "2024"
+license    = "MIT"
+publish    = false
+repository = "https://github.com/squadri/decant"
+version    = "0.1.0"
 
 # =============================================================================
 # Lint Configuration
@@ -197,10 +195,10 @@ uninlined_format_args     = { level = "allow", priority = 3 }
 # Runtime
 anyhow      = "1.0.100"
 clap        = { version = "4.6.1", features = ["derive"] }
-rusqlite    = { version = "0.31", features = ["bundled"] }
 include_dir = "0.7"
 libc        = "0.2.180"
-regex     = "1.11"
+regex       = "1.11"
+rusqlite    = { version = "0.31", features = ["bundled"] }
 serde       = { version = "1.0.228", features = ["derive"] }
 serde_json  = "1.0.150"
 sha2        = "0.10"

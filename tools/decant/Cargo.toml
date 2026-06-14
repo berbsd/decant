@@ -1,12 +1,13 @@
 [package]
-authors.workspace = true
-description       = "CLI that reduces a command's output to save LLM tokens"
-edition.workspace = true
-license.workspace = true
-name              = "decant"
-publish.workspace = true
-readme            = "README.md"
-version.workspace = true
+authors.workspace    = true
+description          = "CLI that reduces a command's output to save LLM tokens"
+edition.workspace    = true
+license.workspace    = true
+name                 = "decant"
+publish.workspace    = true
+readme               = "README.md"
+repository.workspace = true
+version.workspace    = true
 
 [lints]
 workspace = true
@@ -16,16 +17,17 @@ name = "decant"
 path = "src/main.rs"
 
 [dependencies]
-anyhow            = { workspace = true }
-clap              = { workspace = true, features = ["derive"] }
 decant-agents     = { path = "../../crates/decant-agents" }
 decant-core       = { path = "../../crates/decant-core" }
 decant-metrics    = { path = "../../crates/decant-metrics" }
 decant-store      = { path = "../../crates/decant-store" }
 decant-transforms = { path = "../../crates/decant-transforms" }
-serde_json        = { workspace = true }
-sha2              = { workspace = true }
-ureq              = { workspace = true }
+
+anyhow     = { workspace = true }
+clap       = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+sha2       = { workspace = true }
+ureq       = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }

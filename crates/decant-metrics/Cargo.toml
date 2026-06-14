@@ -1,12 +1,13 @@
 [package]
-authors.workspace = true
-description       = "Token/byte reduction measurement for decant"
-edition.workspace = true
-license.workspace = true
-name              = "decant-metrics"
-publish.workspace = true
-readme            = "README.md"
-version.workspace = true
+authors.workspace    = true
+description          = "Token/byte reduction measurement for decant"
+edition.workspace    = true
+license.workspace    = true
+name                 = "decant-metrics"
+publish.workspace    = true
+readme               = "README.md"
+repository.workspace = true
+version.workspace    = true
 
 [lints]
 workspace = true

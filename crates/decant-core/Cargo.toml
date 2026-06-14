@@ -1,12 +1,13 @@
 [package]
-authors.workspace = true
-description       = "decant pipeline engine: Runner + Transform seams and execute()"
-edition.workspace = true
-license.workspace = true
-name              = "decant-core"
-publish.workspace = true
-readme            = "README.md"
-version.workspace = true
+authors.workspace    = true
+description          = "decant pipeline engine: Runner + Transform seams and execute()"
+edition.workspace    = true
+license.workspace    = true
+name                 = "decant-core"
+publish.workspace    = true
+readme               = "README.md"
+repository.workspace = true
+version.workspace    = true
 
 [lints]
 workspace = true
