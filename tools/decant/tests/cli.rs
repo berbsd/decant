@@ -51,3 +51,68 @@ fn explain_lists_builtin_chain() {
   );
   assert!(stdout.contains("collapse"), "stdout was: {stdout}");
 }
+
+#[test]
+fn hook_rewrites_a_bash_command() {
+  use std::{io::Write, process::Stdio};
+
+  let mut child = decant()
+    .args(["hook", "claude"])
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .spawn()
+    .unwrap();
+  child
+    .stdin
+    .take()
+    .unwrap()
+    .write_all(br#"{"tool_name":"Bash","tool_input":{"command":"cargo test"}}"#)
+    .unwrap();
+  let out = child.wait_with_output().unwrap();
+  let stdout = String::from_utf8_lossy(&out.stdout);
+  assert!(
+    stdout.contains("decant run -- cargo test"),
+    "stdout was: {stdout}"
+  );
+}
+
+#[test]
+fn init_project_writes_settings() {
+  let dir = tempfile::tempdir().unwrap();
+  let out = decant()
+    .args(["init", "--project"])
+    .current_dir(dir.path())
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  let settings = std::fs::read_to_string(dir.path().join(".claude").join("settings.json")).unwrap();
+  assert!(
+    settings.contains("decant hook claude"),
+    "settings: {settings}"
+  );
+}
+
+#[test]
+fn history_reports_a_recorded_run() {
+  let dir = tempfile::tempdir().unwrap();
+  let db = dir.path().join("metrics.db");
+
+  // A run records a row...
+  let run = decant()
+    .env("DECANT_DB_PATH", &db)
+    .args(["run", "--no-stats", "--", "printf", "hi"])
+    .output()
+    .unwrap();
+  assert_eq!(run.status.code(), Some(0));
+
+  // ...which `history` then reports.
+  let out = decant()
+    .env("DECANT_DB_PATH", &db)
+    .args(["history"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  let stdout = String::from_utf8_lossy(&out.stdout);
+  assert!(stdout.contains("printf"), "stdout was: {stdout}");
+  assert!(stdout.contains("runs"), "stdout was: {stdout}");
+}

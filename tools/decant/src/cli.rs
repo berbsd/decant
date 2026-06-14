@@ -3,7 +3,9 @@
 
 use clap::{Parser, Subcommand};
 
-use crate::{explain::ExplainArgs, run::RunArgs};
+use crate::{
+  explain::ExplainArgs, history::HistoryArgs, hook::HookArgs, init::InitArgs, run::RunArgs,
+};
 
 /// Top-level CLI struct parsed from `std::env::args`.
 #[derive(Parser)]
@@ -25,4 +27,10 @@ pub enum Commands {
   Run(RunArgs),
   /// Show which transforms apply to a command (no execution).
   Explain(ExplainArgs),
+  /// Install decant's hook into an agent's settings.
+  Init(InitArgs),
+  /// Hook processor invoked by an agent (reads stdin, rewrites, writes stdout).
+  Hook(HookArgs),
+  /// Show recorded run metrics: actual savings and opportunities.
+  History(HistoryArgs),
 }

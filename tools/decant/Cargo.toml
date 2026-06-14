@@ -18,6 +18,12 @@ path = "src/main.rs"
 [dependencies]
 anyhow            = { workspace = true }
 clap              = { workspace = true, features = ["derive"] }
+decant-agents     = { path = "../../crates/decant-agents" }
 decant-core       = { path = "../../crates/decant-core" }
 decant-metrics    = { path = "../../crates/decant-metrics" }
+decant-store      = { path = "../../crates/decant-store" }
 decant-transforms = { path = "../../crates/decant-transforms" }
+serde_json        = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

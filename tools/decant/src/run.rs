@@ -10,7 +10,8 @@ use anyhow::Context;
 use clap::Args;
 use decant_core::{CaptureRunner, TimeoutKind, execute};
 use decant_metrics::measure;
-use decant_transforms::{Resolved, resolve};
+use decant_store::{ConfigKind, RunRecord};
+use decant_transforms::{ConfigSource, Resolved, resolve};
 
 #[derive(Args)]
 pub struct RunArgs {
@@ -72,6 +73,15 @@ fn stats_line(m: &decant_metrics::Measurement) -> String {
   )
 }
 
+fn config_kind(source: &ConfigSource) -> ConfigKind {
+  match source {
+    | ConfigSource::Builtin(_) => ConfigKind::Builtin,
+    | ConfigSource::User(_) => ConfigKind::User,
+    | ConfigSource::Project(_) => ConfigKind::Project,
+    | ConfigSource::Identity => ConfigKind::Identity,
+  }
+}
+
 /// Execute the `run` subcommand, returning the child's exit status.
 ///
 /// Spawns the command, captures its output via [`CaptureRunner`], applies the
@@ -119,14 +129,34 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
     writeln!(err, "{}", timeout_marker(kind, idle_timeout, wall_timeout))?;
   }
 
+  let raw_bytes = [captured.stdout.as_slice(), captured.stderr.as_slice()].concat();
+  let reduced_bytes = [output.stdout.as_slice(), output.stderr.as_slice()].concat();
+  let m = measure(&raw_bytes, &reduced_bytes, elapsed);
+
   if !no_stats {
-    let raw = [captured.stdout.as_slice(), captured.stderr.as_slice()].concat();
-    let red = [output.stdout.as_slice(), output.stderr.as_slice()].concat();
-    let m = measure(&raw, &red, elapsed);
     writeln!(err, "{}", stats_line(&m))?;
   }
-
   err.flush()?;
+
+  // Best-effort: persist this run for `decant history`. A DB failure must never
+  // affect the command's output or exit code.
+  let program_base = std::path::Path::new(program.as_str())
+    .file_name()
+    .and_then(|s| s.to_str())
+    .unwrap_or(program.as_str())
+    .to_string();
+  let _unused = decant_store::record(&RunRecord {
+    program:       program_base,
+    subcommand:    rest.iter().find(|a| !a.starts_with('-')).cloned(),
+    raw_command:   command.join(" "),
+    measurement:   m,
+    exit_code:     captured.exit_code,
+    project:       std::env::current_dir()
+      .ok()
+      .and_then(|p| p.file_name().map(|s| s.to_string_lossy().into_owned())),
+    config_source: config_kind(&resolved.source),
+  });
+
   Ok(exit_code_to_status(captured.exit_code))
 }
 

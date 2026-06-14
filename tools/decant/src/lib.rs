@@ -17,6 +17,9 @@
 
 mod cli;
 pub mod explain;
+pub mod history;
+pub mod hook;
+pub mod init;
 pub mod run;
 
 use std::{io::Write, process::ExitCode};
@@ -43,6 +46,9 @@ pub fn dispatch(cli: Cli) -> ExitCode {
   let result = match cli.command {
     | Commands::Run(args) => run::run(args),
     | Commands::Explain(ref args) => explain::run(args),
+    | Commands::Init(args) => init::run(args),
+    | Commands::Hook(args) => hook::run(args),
+    | Commands::History(args) => history::run(args),
   };
   match result {
     | Ok(code) => code,
