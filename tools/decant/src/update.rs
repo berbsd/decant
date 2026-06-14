@@ -43,7 +43,7 @@ fn parse_version(v: &str) -> Option<(u64, u64, u64)> {
   Some((major, minor, patch))
 }
 
-/// True if `latest` is a higher version than `current`. Unparseable versions
+/// True if `latest` is a higher version than `current`. Unparsable versions
 /// yield `false` (never auto-update on garbage).
 fn is_outdated(
   current: &str,
@@ -212,6 +212,6 @@ mod tests {
     assert!(is_outdated("0.1.0", "v0.1.1"));
     assert!(!is_outdated("0.2.0", "0.2.0"));
     assert!(!is_outdated("0.2.0", "0.1.0"));
-    assert!(!is_outdated("0.1.0", "garbage")); // never update on unparseable
+    assert!(!is_outdated("0.1.0", "garbage")); // never update on unparsable
   }
 }
