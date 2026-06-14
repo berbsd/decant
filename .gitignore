@@ -76,6 +76,7 @@ Icon
 !**/CLAUDE.md
 !**/PULL_REQUEST_TEMPLATE.md
 !**/CHANGELOG.md
+!**/CONTRIBUTING.md
 
 # --- Claude Code ---
 # Track .claude/ contents (slash commands, etc.) but exclude per-user state
