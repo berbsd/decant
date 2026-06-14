@@ -7,11 +7,10 @@
 
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
 use serde_json::{Value, json};
 
 use crate::{
-  agent::{Agent, HookRequest, InstallOutcome, Scope},
+  agent::{Agent, AgentError, HookRequest, InstallOutcome, Scope},
   install::install_to_file,
 };
 
@@ -29,7 +28,7 @@ impl Agent for ClaudeAgent {
   fn settings_path(
     &self,
     scope: Scope,
-  ) -> Result<PathBuf> {
+  ) -> Result<PathBuf, AgentError> {
     match scope {
       | Scope::Project => Ok(PathBuf::from(".claude").join("settings.json")),
       | Scope::Global => {
@@ -38,7 +37,7 @@ impl Agent for ClaudeAgent {
             return Ok(PathBuf::from(dir).join("settings.json"));
           }
         }
-        let home = std::env::var("HOME").context("HOME is not set")?;
+        let home = std::env::var("HOME").map_err(|_e| AgentError::NoHome)?;
         Ok(PathBuf::from(home).join(".claude").join("settings.json"))
       },
     }
@@ -47,7 +46,7 @@ impl Agent for ClaudeAgent {
   fn install_hook(
     &self,
     scope: Scope,
-  ) -> Result<InstallOutcome> {
+  ) -> Result<InstallOutcome, AgentError> {
     let path = self.settings_path(scope)?;
     install_to_file(&path, MATCHER, HOOK_COMMAND)
   }
@@ -55,8 +54,8 @@ impl Agent for ClaudeAgent {
   fn parse_request(
     &self,
     stdin: &str,
-  ) -> Result<Option<HookRequest>> {
-    let v: Value = serde_json::from_str(stdin).context("parsing hook stdin JSON")?;
+  ) -> Result<Option<HookRequest>, AgentError> {
+    let v: Value = serde_json::from_str(stdin)?;
     if v.get("tool_name").and_then(Value::as_str) != Some("Bash") {
       return Ok(None);
     }

@@ -11,10 +11,23 @@ use std::{
   time::{SystemTime, UNIX_EPOCH},
 };
 
-use anyhow::{Context, Result};
 use decant_metrics::Measurement;
 use rusqlite::{Connection, params};
 use serde::Serialize;
+
+/// Errors from the metrics store.
+#[derive(Debug, thiserror::Error)]
+pub enum StoreError {
+  /// `HOME` is not set and no `DECANT_DB_PATH`/`XDG_DATA_HOME` was given.
+  #[error("HOME is not set")]
+  NoHome,
+  /// A `SQLite` operation failed.
+  #[error("database error: {0}")]
+  Sqlite(#[from] rusqlite::Error),
+  /// A filesystem operation failed.
+  #[error("filesystem error: {0}")]
+  Io(#[from] std::io::Error),
+}
 
 /// Which config produced a run's reduction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -139,9 +152,9 @@ impl Summary {
 /// Resolve the metrics DB path.
 ///
 /// # Errors
-/// Returns an error if neither `DECANT_DB_PATH`/`XDG_DATA_HOME` nor `HOME` is
-/// set.
-pub fn db_path() -> Result<PathBuf> {
+/// Returns [`StoreError::NoHome`] if neither `DECANT_DB_PATH`/`XDG_DATA_HOME`
+/// nor `HOME` is set.
+pub fn db_path() -> Result<PathBuf, StoreError> {
   if let Ok(p) = std::env::var("DECANT_DB_PATH") {
     if !p.is_empty() {
       return Ok(PathBuf::from(p));
@@ -150,7 +163,7 @@ pub fn db_path() -> Result<PathBuf> {
   let base = match std::env::var("XDG_DATA_HOME") {
     | Ok(x) if !x.is_empty() => PathBuf::from(x),
     | _ => {
-      let home = std::env::var("HOME").context("HOME is not set")?;
+      let home = std::env::var("HOME").map_err(|_e| StoreError::NoHome)?;
       PathBuf::from(home).join(".local").join("share")
     },
   };
@@ -169,10 +182,9 @@ fn now_secs() -> i64 {
     .unwrap_or(0)
 }
 
-fn init_schema(conn: &Connection) -> Result<()> {
-  conn
-    .execute_batch(
-      "CREATE TABLE IF NOT EXISTS runs (
+fn init_schema(conn: &Connection) -> Result<(), StoreError> {
+  conn.execute_batch(
+    "CREATE TABLE IF NOT EXISTS runs (
             id INTEGER PRIMARY KEY,
             ts INTEGER NOT NULL,
             program TEXT NOT NULL,
@@ -183,19 +195,18 @@ fn init_schema(conn: &Connection) -> Result<()> {
             duration_ms INTEGER, exit_code INTEGER,
             project TEXT, config_source TEXT NOT NULL
         );",
-    )
-    .context("creating runs table")?;
+  )?;
   Ok(())
 }
 
-fn open() -> Result<Connection> {
+fn open() -> Result<Connection, StoreError> {
   let path = db_path()?;
   if let Some(parent) = path.parent() {
     if !parent.as_os_str().is_empty() {
-      std::fs::create_dir_all(parent).with_context(|| format!("creating {}", parent.display()))?;
+      std::fs::create_dir_all(parent)?;
     }
   }
-  let conn = Connection::open(&path).with_context(|| format!("opening {}", path.display()))?;
+  let conn = Connection::open(&path)?;
   init_schema(&conn)?;
   Ok(conn)
 }
@@ -203,36 +214,34 @@ fn open() -> Result<Connection> {
 fn insert(
   conn: &Connection,
   r: &RunRecord,
-) -> Result<()> {
-  conn
-    .execute(
-      "INSERT INTO runs
+) -> Result<(), StoreError> {
+  conn.execute(
+    "INSERT INTO runs
          (ts, program, subcommand, raw_command, bytes_in, bytes_out,
           tokens_in, tokens_out, duration_ms, exit_code, project, config_source)
          VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)",
-      params![
-        now_secs(),
-        r.program,
-        r.subcommand,
-        r.raw_command,
-        to_i64(r.measurement.bytes_in),
-        to_i64(r.measurement.bytes_out),
-        to_i64(r.measurement.tokens_in),
-        to_i64(r.measurement.tokens_out),
-        i64::try_from(r.measurement.duration.as_millis()).unwrap_or(i64::MAX),
-        i64::from(r.exit_code),
-        r.project,
-        r.config_source.as_db(),
-      ],
-    )
-    .context("inserting run")?;
+    params![
+      now_secs(),
+      r.program,
+      r.subcommand,
+      r.raw_command,
+      to_i64(r.measurement.bytes_in),
+      to_i64(r.measurement.bytes_out),
+      to_i64(r.measurement.tokens_in),
+      to_i64(r.measurement.tokens_out),
+      i64::try_from(r.measurement.duration.as_millis()).unwrap_or(i64::MAX),
+      i64::from(r.exit_code),
+      r.project,
+      r.config_source.as_db(),
+    ],
+  )?;
   Ok(())
 }
 
 fn query(
   conn: &Connection,
   filter: &HistoryFilter,
-) -> Result<Summary> {
+) -> Result<Summary, StoreError> {
   let since_cutoff: i64 = match filter.since_days {
     | Some(d) => {
       now_secs().saturating_sub(i64::try_from(d).unwrap_or(i64::MAX).saturating_mul(86_400))
@@ -300,9 +309,9 @@ fn query(
 /// Append a run to the metrics DB.
 ///
 /// # Errors
-/// Returns an error if the DB cannot be opened or written. Callers that must
-/// not fail on a DB problem should ignore the result.
-pub fn record(record: &RunRecord) -> Result<()> {
+/// Returns [`StoreError`] if the DB cannot be opened or written. Callers that
+/// must not fail on a DB problem should ignore the result.
+pub fn record(record: &RunRecord) -> Result<(), StoreError> {
   let conn = open()?;
   insert(&conn, record)
 }
@@ -310,8 +319,8 @@ pub fn record(record: &RunRecord) -> Result<()> {
 /// Aggregate the metrics DB into a [`Summary`].
 ///
 /// # Errors
-/// Returns an error if the DB cannot be opened or queried.
-pub fn summary(filter: &HistoryFilter) -> Result<Summary> {
+/// Returns [`StoreError`] if the DB cannot be opened or queried.
+pub fn summary(filter: &HistoryFilter) -> Result<Summary, StoreError> {
   let conn = open()?;
   query(&conn, filter)
 }

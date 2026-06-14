@@ -2,7 +2,19 @@
 
 use std::path::PathBuf;
 
-use anyhow::Result;
+/// Errors from agent hook operations.
+#[derive(Debug, thiserror::Error)]
+pub enum AgentError {
+  /// The home/config-dir environment variable is not set.
+  #[error("HOME is not set")]
+  NoHome,
+  /// Reading or writing a settings file failed.
+  #[error("settings file I/O error: {0}")]
+  Io(#[from] std::io::Error),
+  /// A settings file or hook payload was not valid JSON.
+  #[error("invalid JSON: {0}")]
+  Json(#[from] serde_json::Error),
+}
 
 /// Where a hook is installed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,31 +49,32 @@ pub trait Agent {
   /// Path to the agent's settings file for `scope`.
   ///
   /// # Errors
-  /// Returns an error if a required environment variable (e.g. `HOME`) is
-  /// unset.
+  /// Returns [`AgentError::NoHome`] if a required environment variable (e.g.
+  /// `HOME`) is unset.
   fn settings_path(
     &self,
     scope: Scope,
-  ) -> Result<PathBuf>;
+  ) -> Result<PathBuf, AgentError>;
 
   /// Merge decant's hook entry into the settings file. Idempotent.
   ///
   /// # Errors
-  /// Returns an error if the settings file cannot be read, parsed, or written.
+  /// Returns [`AgentError::Io`] or [`AgentError::Json`] if the settings file
+  /// cannot be read, parsed, or written.
   fn install_hook(
     &self,
     scope: Scope,
-  ) -> Result<InstallOutcome>;
+  ) -> Result<InstallOutcome, AgentError>;
 
   /// Parse the agent's hook stdin JSON. `Ok(None)` means "not a command tool
   /// call decant should touch" — the caller emits a passthrough.
   ///
   /// # Errors
-  /// Returns an error if `stdin` is not valid JSON.
+  /// Returns [`AgentError::Json`] if `stdin` is not valid JSON.
   fn parse_request(
     &self,
     stdin: &str,
-  ) -> Result<Option<HookRequest>>;
+  ) -> Result<Option<HookRequest>, AgentError>;
 
   /// The agent's hook JSON that rewrites the command to `rewritten`.
   fn format_response(

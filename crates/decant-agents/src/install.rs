@@ -3,10 +3,9 @@
 
 use std::path::Path;
 
-use anyhow::{Context, Result};
 use serde_json::{Map, Value, json};
 
-use crate::agent::InstallOutcome;
+use crate::agent::{AgentError, InstallOutcome};
 
 /// Merge a `PreToolUse` hook entry (`matcher` -> `command`) into `settings`,
 /// creating any missing structure and preserving everything else. Idempotent:
@@ -66,40 +65,39 @@ pub fn merge_pretooluse_hook(
 /// or blank).
 ///
 /// # Errors
-/// Returns an error if the file exists but cannot be read or is invalid JSON.
-pub fn read_settings(path: &Path) -> Result<Value> {
+/// Returns [`AgentError::Io`] if the file cannot be read, or
+/// [`AgentError::Json`] if it is invalid JSON.
+pub fn read_settings(path: &Path) -> Result<Value, AgentError> {
   if !path.exists() {
     return Ok(Value::Object(Map::new()));
   }
-  let text =
-    std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+  let text = std::fs::read_to_string(path)?;
   if text.trim().is_empty() {
     return Ok(Value::Object(Map::new()));
   }
-  serde_json::from_str(&text).with_context(|| format!("parsing {}", path.display()))
+  Ok(serde_json::from_str(&text)?)
 }
 
 /// Merge the hook into the settings file at `path`, writing only if changed.
 ///
 /// # Errors
-/// Returns an error if the file cannot be read, parsed, created, or written.
+/// Returns [`AgentError::Io`] or [`AgentError::Json`] if the file cannot be
+/// read, parsed, created, or written.
 pub fn install_to_file(
   path: &Path,
   matcher: &str,
   command: &str,
-) -> Result<InstallOutcome> {
+) -> Result<InstallOutcome, AgentError> {
   let mut settings = read_settings(path)?;
   let outcome = merge_pretooluse_hook(&mut settings, matcher, command);
   if matches!(outcome, InstallOutcome::Installed) {
     if let Some(parent) = path.parent() {
       if !parent.as_os_str().is_empty() {
-        std::fs::create_dir_all(parent)
-          .with_context(|| format!("creating {}", parent.display()))?;
+        std::fs::create_dir_all(parent)?;
       }
     }
-    let pretty = serde_json::to_string_pretty(&settings).context("serializing settings")?;
-    std::fs::write(path, format!("{pretty}\n"))
-      .with_context(|| format!("writing {}", path.display()))?;
+    let pretty = serde_json::to_string_pretty(&settings)?;
+    std::fs::write(path, format!("{pretty}\n"))?;
   }
   Ok(outcome)
 }

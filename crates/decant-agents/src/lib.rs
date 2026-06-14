@@ -17,5 +17,5 @@ pub mod install;
 pub mod registry;
 pub mod rewrite;
 
-pub use agent::{Agent, HookRequest, InstallOutcome, Scope};
+pub use agent::{Agent, AgentError, HookRequest, InstallOutcome, Scope};
 pub use agents::ClaudeAgent;
