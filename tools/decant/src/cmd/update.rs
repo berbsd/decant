@@ -12,7 +12,7 @@ use anyhow::{Context, Result, bail};
 use clap::Args;
 use sha2::{Digest, Sha256};
 
-const REPO: &str = "squadri/decant";
+const REPO: &str = "berbsd/decant";
 const USER_AGENT: &str = "decant-update";
 
 /// Arguments for `decant update`.

@@ -38,7 +38,7 @@ The same reduction can run automatically: install a hook into your agent
 From a release (downloads the prebuilt binary for your platform):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/squadri/decant/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/berbsd/decant/main/install.sh | sh
 ```
 
 This installs to `~/.local/bin` by default (override with `DECANT_INSTALL_DIR`).
@@ -317,7 +317,7 @@ cargo insta review   # review/accept snapshot changes
 
 Releases are cut with `cargo-release` and published by CI on tag push.
 One-time prerequisites: `cargo install cargo-release git-cliff`, and a GitHub
-repo at `github.com/squadri/decant` with `origin` set.
+repo at `github.com/berbsd/decant` with `origin` set.
 
 ```sh
 just changelog                                                  # refresh CHANGELOG.md

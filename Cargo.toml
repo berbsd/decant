@@ -3,11 +3,11 @@ members  = ["crates/*", "tools/*"]
 resolver = "3"
 
 [workspace.package]
-authors    = ["David <david@squadri.com>"]
+authors    = ["DavidB <berbsd@gmail.com>"]
 edition    = "2024"
 license    = "MIT"
 publish    = false
-repository = "https://github.com/squadri/decant"
+repository = "https://github.com/berbsd/decant"
 version    = "0.1.0"
 
 # =============================================================================

@@ -1,10 +1,10 @@
 #!/bin/sh
 # decant installer — detects host arch, downloads the latest release binary.
-#   curl -fsSL https://raw.githubusercontent.com/squadri/decant/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/berbsd/decant/main/install.sh | sh
 # Env: DECANT_VERSION (pin a tag), DECANT_INSTALL_DIR (default ~/.local/bin)
 set -eu
 
-REPO="squadri/decant"
+REPO="berbsd/decant"
 BIN="decant"
 INSTALL_DIR="${DECANT_INSTALL_DIR:-$HOME/.local/bin}"
 

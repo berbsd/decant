@@ -57,5 +57,5 @@ tag_pattern = "v[0-9].*"
 sort_commits = "oldest"
 
 [remote.github]
-owner = "squadri"
+owner = "berbsd"
 repo  = "decant"
