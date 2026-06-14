@@ -45,3 +45,24 @@ hooks:
 # Security audit
 audit:
     cargo deny check
+
+# =============================================================================
+# Releases
+# =============================================================================
+
+# Regenerate CHANGELOG.md from conventional commits
+changelog:
+    git cliff -o CHANGELOG.md
+
+# Preview unreleased changelog entries (no file written)
+changelog-preview:
+    git cliff --unreleased
+
+# Cut a release: run checks, bump version, tag, and push (CI builds binaries).
+# level = patch | minor | major
+release level="patch":
+    cargo release {{ level }} --execute
+
+# Preview a release without changing anything (cargo-release dry-run is default)
+release-dry-run level="patch":
+    cargo release {{ level }}

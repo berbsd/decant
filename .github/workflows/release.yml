@@ -1,0 +1,68 @@
+# =============================================================================
+# Release Pipeline
+# =============================================================================
+# Triggered by pushing a version tag (e.g. v0.1.0). Generates release notes
+# from conventional commits (git-cliff) and cross-builds the four target
+# binaries, attaching them + SHA256 checksums to the GitHub Release.
+# =============================================================================
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags for git-cliff
+
+      - name: Generate release notes
+        uses: orhun/git-cliff-action@v4
+        id: cliff
+        with:
+          config: cliff.toml
+          args: --latest --strip all
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.cliff.outputs.content }}
+          draft: false
+          prerelease: false
+
+  upload-assets:
+    name: Build & upload ${{ matrix.target }}
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and upload binary
+        uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: decant
+          target: ${{ matrix.target }}
+          archive: decant-$target
+          checksum: sha256
+          token: ${{ secrets.GITHUB_TOKEN }}

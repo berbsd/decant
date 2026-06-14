@@ -55,3 +55,7 @@ commit_parsers = [
 filter_commits = false
 tag_pattern = "v[0-9].*"
 sort_commits = "oldest"
+
+[remote.github]
+owner = "squadri"
+repo = "decant"
