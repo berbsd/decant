@@ -21,6 +21,7 @@ pub mod history;
 pub mod hook;
 pub mod init;
 pub mod run;
+pub mod update;
 
 use std::{io::Write, process::ExitCode};
 
@@ -49,6 +50,7 @@ pub fn dispatch(cli: Cli) -> ExitCode {
     | Commands::Init(args) => init::run(args),
     | Commands::Hook(args) => hook::run(args),
     | Commands::History(args) => history::run(args),
+    | Commands::Update(ref args) => update::run(args),
   };
   match result {
     | Ok(code) => code,

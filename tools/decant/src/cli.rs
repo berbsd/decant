@@ -5,6 +5,7 @@ use clap::{Parser, Subcommand};
 
 use crate::{
   explain::ExplainArgs, history::HistoryArgs, hook::HookArgs, init::InitArgs, run::RunArgs,
+  update::UpdateArgs,
 };
 
 /// Top-level CLI struct parsed from `std::env::args`.
@@ -33,4 +34,6 @@ pub enum Commands {
   Hook(HookArgs),
   /// Show recorded run metrics: actual savings and opportunities.
   History(HistoryArgs),
+  /// Update decant to the latest release.
+  Update(UpdateArgs),
 }
