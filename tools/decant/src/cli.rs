@@ -3,7 +3,7 @@
 
 use clap::{Parser, Subcommand};
 
-use crate::{
+use crate::cmd::{
   explain::ExplainArgs, history::HistoryArgs, hook::HookArgs, init::InitArgs, run::RunArgs,
   update::UpdateArgs,
 };

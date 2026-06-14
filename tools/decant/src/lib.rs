@@ -16,18 +16,19 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod cli;
-pub mod explain;
-pub mod history;
-pub mod hook;
-pub mod init;
-pub mod run;
-pub mod update;
-
+pub mod cmd {
+  pub mod explain;
+  pub mod history;
+  pub mod hook;
+  pub mod init;
+  pub mod run;
+  pub mod update;
+}
 use std::{io::Write, process::ExitCode};
 
 use clap::Parser;
 pub use cli::{Cli, Commands};
-pub use run::{RunArgs, run};
+pub use cmd::run::{RunArgs, run};
 
 /// Parse `std::env::args`, dispatch the subcommand, and return an exit code.
 ///
@@ -45,12 +46,12 @@ pub fn run_cli() -> ExitCode {
 #[must_use]
 pub fn dispatch(cli: Cli) -> ExitCode {
   let result = match cli.command {
-    | Commands::Run(args) => run::run(args),
-    | Commands::Explain(ref args) => explain::run(args),
-    | Commands::Init(args) => init::run(args),
-    | Commands::Hook(args) => hook::run(args),
-    | Commands::History(args) => history::run(args),
-    | Commands::Update(ref args) => update::run(args),
+    | Commands::Run(args) => cmd::run::run(args),
+    | Commands::Explain(ref args) => cmd::explain::run(args),
+    | Commands::Init(args) => cmd::init::run(args),
+    | Commands::Hook(args) => cmd::hook::run(args),
+    | Commands::History(args) => cmd::history::run(args),
+    | Commands::Update(ref args) => cmd::update::run(args),
   };
   match result {
     | Ok(code) => code,
