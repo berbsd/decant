@@ -17,6 +17,10 @@
 # Set to true or remove for open-source crates
 publish = false
 
+# All workspace crates share one version (via `version.workspace = true`), so
+# bump and tag them together as a single unit — one commit, one `vX.Y.Z` tag.
+shared-version = true
+
 # Push commits and tags to remote after release
 push = true
 
@@ -26,11 +30,15 @@ tag = true
 # Tag format: v0.1.0
 tag-name = "v{{version}}"
 
-# Commit message format
-tag-message = "release: {{crate_name}} v{{version}}"
+# Tag message format. Use the literal product name, not `{{crate_name}}`:
+# this is a single shared-version tag, and `{{crate_name}}` would resolve to
+# the first workspace crate (e.g. `decant-agents`), not the product.
+tag-message = "release: decant v{{version}}"
 
 # Run `just check` before releasing
 pre-release-hook = ["just", "check"]
 
-# Commit message for version bump
-pre-release-commit-message = "chore(release): bump {{crate_name}} to v{{version}}"
+# Commit message for the consolidated version bump. `{{crate_name}}` is NOT
+# available in this workspace-wide commit context (it would be left literal),
+# so use only `{{version}}`.
+pre-release-commit-message = "chore(release): v{{version}}"
