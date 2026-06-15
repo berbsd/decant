@@ -1,5 +1,7 @@
 # decant
 
+[![codecov](https://codecov.io/gh/berbsd/decant/graph/badge.svg)](https://codecov.io/gh/berbsd/decant)
+
 `decant` wraps a command, captures its output, and reduces it to minimize the
 tokens an LLM spends reading tool output. It strips noise, collapses repetition,
 and caps runaway logs — while preserving the command's exit code and raw byte

@@ -3,9 +3,9 @@
 #
 # Installs the toolchain components and CLI tools the workspace uses:
 #   just · taplo · cargo-nextest · typos-cli · cargo-deny · git-cliff ·
-#   cargo-release · cocogitto (cog), plus nightly rustfmt (for
-#   `cargo +nightly fmt`). The git-hook runners lefthook and gitleaks are
-#   Go binaries, installed via Homebrew when available.
+#   cargo-release · cocogitto (cog) · cargo-llvm-cov, plus nightly rustfmt
+#   (for `cargo +nightly fmt`). The git-hook runners lefthook and gitleaks
+#   are Go binaries, installed via Homebrew when available.
 #
 # Prefers cargo-binstall (prebuilt binaries) for speed, falling back to
 # `cargo install`. Re-runnable: already-installed tools are skipped.
@@ -28,9 +28,9 @@ fi
 note "found $(rustc --version) / $(cargo --version)"
 
 # --- 2. Rust toolchain components -------------------------------------------
-note "ensuring the pinned toolchain + components (rustfmt, clippy, rust-src)"
+note "ensuring the pinned toolchain + components (rustfmt, clippy, rust-src, llvm-tools-preview)"
 rustup show >/dev/null 2>&1 || true                     # installs the rust-toolchain.toml channel
-rustup component add rustfmt clippy rust-src >/dev/null 2>&1 || true
+rustup component add rustfmt clippy rust-src llvm-tools-preview >/dev/null 2>&1 || true
 note "ensuring nightly rustfmt (used by 'just fmt' / 'cargo +nightly fmt')"
 rustup toolchain install nightly --profile minimal --component rustfmt >/dev/null 2>&1 || true
 
@@ -61,6 +61,7 @@ install_tool cargo-deny cargo-deny
 install_tool git-cliff git-cliff
 install_tool cargo-release cargo-release
 install_tool cog cocogitto          # `cog verify` runs the commit-msg hook
+install_tool cargo-llvm-cov cargo-llvm-cov   # code coverage (`just coverage`)
 
 # --- 4. Git-hook tools (Go binaries — not on crates.io) ---------------------
 # lefthook runs the hooks; gitleaks (pre-commit secret scan) and cog
