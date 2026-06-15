@@ -1,0 +1,19 @@
+# Dependabot keeps dependencies current by opening PRs when newer versions
+# ship. https://docs.github.com/code-security/dependabot
+version: 2
+updates:
+  # GitHub Actions pinned in .github/workflows/*.yml
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+
+  # Cargo dependencies across the workspace
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build"

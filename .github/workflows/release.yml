@@ -21,7 +21,7 @@ jobs:
     name: Create release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # full history + tags for git-cliff
 
@@ -36,7 +36,7 @@ jobs:
       # Release immutability forbids modifying a published release's assets or
       # tags, so we publish only after upload-assets finishes (publish-release).
       - name: Create draft GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body: ${{ steps.cliff.outputs.content }}
           draft: true
@@ -59,7 +59,7 @@ jobs:
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build and upload binary
         uses: taiki-e/upload-rust-binary-action@v1
