@@ -209,7 +209,7 @@ dependencies = [
 
 [[package]]
 name = "decant"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "clap",
@@ -226,7 +226,7 @@ dependencies = [
 
 [[package]]
 name = "decant-agents"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "regex",
  "serde_json",
@@ -236,7 +236,7 @@ dependencies = [
 
 [[package]]
 name = "decant-core"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "libc",
  "thiserror",
@@ -244,11 +244,11 @@ dependencies = [
 
 [[package]]
 name = "decant-metrics"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "decant-store"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "decant-metrics",
  "rusqlite",
@@ -258,7 +258,7 @@ dependencies = [
 
 [[package]]
 name = "decant-transforms"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "decant-core",
  "include_dir",
