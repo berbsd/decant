@@ -5,8 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Bug Fixes
-
-- **update:** Correct 'unparsable' typo flagged by typos hook
+- none
 
 ### Documentation
 
@@ -15,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Add CONTRIBUTING guide
 - **cli:** Enrich --help with long_about, examples, and grouping
 - Consolidate decant README into the workspace root
+- Update changelog
 
 ### Features
 
@@ -43,5 +43,9 @@ All notable changes to this project will be documented in this file.
 ### Styling
 
 - **toml:** Align key spacing in cliff.toml and cargo-nextest.toml
+
+### Build
+
+- **bootstrap:** Install cocogitto, lefthook, and gitleaks
 
 
