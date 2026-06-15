@@ -32,11 +32,14 @@ jobs:
           config: cliff.toml
           args: --latest --strip all
 
-      - name: Create GitHub Release
+      # Create as a DRAFT so the binaries can be attached before publishing.
+      # Release immutability forbids modifying a published release's assets or
+      # tags, so we publish only after upload-assets finishes (publish-release).
+      - name: Create draft GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           body: ${{ steps.cliff.outputs.content }}
-          draft: false
+          draft: true
           prerelease: false
 
   upload-assets:
@@ -66,3 +69,17 @@ jobs:
           archive: decant-$target
           checksum: sha256
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publish the draft only after every asset is attached. Once published the
+  # release becomes immutable, with all binaries + checksums already in place.
+  publish-release:
+    name: Publish release
+    needs: upload-assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark release as published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: gh release edit "$TAG" --draft=false --repo "$REPO"
