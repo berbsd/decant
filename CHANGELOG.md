@@ -4,9 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Bug Fixes
+
+- **install:** Correct checksum asset name (stem, not .tar.gz)
+- **typos:** Exclude generated CHANGELOG.md from spell-check
+
+### Miscellaneous
+
+- Bump actions to node24 versions and add Dependabot
+- **just:** Combine release flow into one recipe via cargo-release
+
+## [0.1.4] - 2026-06-15
+
 ### Documentation
 
 - **readme:** Add CI, release, and license badges
+- Update changelog
 
 ### Features
 
@@ -44,7 +57,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- **update:** Correct 'unparsable' typo flagged by typos hook
+- **update:** Correct 'unparseable' typo flagged by typos hook
 
 ### Documentation
 
@@ -87,3 +100,5 @@ All notable changes to this project will be documented in this file.
 ### Build
 
 - **bootstrap:** Install cocogitto, lefthook, and gitleaks
+
+
