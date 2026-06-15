@@ -4,9 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Styling
+
+- **imports:** Hoist inner use statements to module level
+
+### Build
+
+- **deps:** Upgrade ureq to 3.x (+ rusqlite, sha2) and adapt update.rs
+
+## [0.1.7] - 2026-06-15
+
 ### Bug Fixes
 
 - **update:** Report a clear message when the GitHub API rate-limits
+
+### Documentation
+
+- Update changelog
 
 ## [0.1.6] - 2026-06-15
 
