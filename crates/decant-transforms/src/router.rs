@@ -8,6 +8,7 @@
 use std::{
   collections::BTreeMap,
   fmt,
+  io::Write,
   path::{Path, PathBuf},
   sync::LazyLock,
 };
@@ -185,7 +186,6 @@ fn eprintln_warn(
   source: &ConfigSource,
   e: &crate::config::ConfigError,
 ) -> std::io::Result<()> {
-  use std::io::Write;
   writeln!(
     std::io::stderr(),
     "decant: config {source} invalid: {e} — passing through"

@@ -3,10 +3,16 @@
 
 use std::{
   io::Read,
+  os::unix::process::{CommandExt, ExitStatusExt},
   process::{Child, Command, Stdio},
   sync::mpsc::{self, RecvTimeoutError, Sender},
   thread::{self, JoinHandle},
   time::{Duration, Instant},
+};
+
+use nix::{
+  sys::signal::{Signal, killpg},
+  unistd::Pid,
 };
 
 use crate::{
@@ -121,11 +127,6 @@ fn spawn_reader<R: Read + Send + 'static>(
 /// SIGTERM the child's process group, grace, then SIGKILL if still alive.
 #[cfg(unix)]
 fn terminate(child: &mut Child) {
-  use nix::{
-    sys::signal::{Signal, killpg},
-    unistd::Pid,
-  };
-
   // The child is spawned with `process_group(0)`, so it leads its own process
   // group whose PGID equals its PID. `killpg` signals that whole group, so any
   // grandchildren die with it. Errors (e.g. the group is already gone) are
@@ -153,7 +154,6 @@ fn terminate(child: &mut Child) {
 /// `None`).
 #[cfg(unix)]
 fn exit_code_of(status: std::process::ExitStatus) -> i32 {
-  use std::os::unix::process::ExitStatusExt;
   status
     .code()
     .unwrap_or_else(|| status.signal().map_or(-1, |s| 128 + s))
@@ -175,7 +175,6 @@ impl Runner for CaptureRunner {
       .stdin(Stdio::null());
     #[cfg(unix)]
     {
-      use std::os::unix::process::CommandExt;
       cmd.process_group(0);
     }
 

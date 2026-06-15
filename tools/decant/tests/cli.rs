@@ -1,7 +1,10 @@
 //! Black-box CLI tests: drive the built `decant` binary end-to-end.
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
-use std::process::Command;
+use std::{
+  io::Write,
+  process::{Command, Stdio},
+};
 
 fn decant() -> Command {
   Command::new(env!("CARGO_BIN_EXE_decant"))
@@ -54,8 +57,6 @@ fn explain_lists_builtin_chain() {
 
 #[test]
 fn hook_rewrites_a_bash_command() {
-  use std::{io::Write, process::Stdio};
-
   let mut child = decant()
     .args(["hook", "claude"])
     .stdin(Stdio::piped())
@@ -196,7 +197,6 @@ fn hook_unknown_agent_emits_empty_object() {
 
 #[test]
 fn hook_passes_through_non_bash_input() {
-  use std::{io::Write, process::Stdio};
   let mut child = decant()
     .args(["hook", "claude"])
     .stdin(Stdio::piped())

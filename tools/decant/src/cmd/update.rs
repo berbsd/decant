@@ -9,7 +9,9 @@
 //! touched.
 
 use std::{
+  fmt::Write as _,
   io::Write,
+  os::unix::fs::PermissionsExt,
   path::Path,
   process::{Command, ExitCode},
 };
@@ -179,7 +181,6 @@ fn verify_sha256(
   archive: &Path,
   sha_file: &Path,
 ) -> Result<()> {
-  use std::fmt::Write as _;
   let sums = std::fs::read_to_string(sha_file).context("reading the checksum file")?;
   let expected = sums
     .split_whitespace()
@@ -239,7 +240,6 @@ fn apply_update(
   std::fs::copy(&new_bin, &staged).context("staging the new binary")?;
   #[cfg(unix)]
   {
-    use std::os::unix::fs::PermissionsExt;
     std::fs::set_permissions(&staged, std::fs::Permissions::from_mode(0o755))
       .context("setting permissions")?;
   }
@@ -253,6 +253,8 @@ fn apply_update(
 // HTTP calls; `significant_drop_tightening` misreads it as droppable early.
 #[allow(clippy::significant_drop_tightening)]
 mod tests {
+  use std::fmt::Write as _;
+
   use super::*;
 
   #[test]
@@ -286,7 +288,6 @@ mod tests {
   }
 
   fn sha256_hex(bytes: &[u8]) -> String {
-    use std::fmt::Write as _;
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     let mut hex = String::with_capacity(64);

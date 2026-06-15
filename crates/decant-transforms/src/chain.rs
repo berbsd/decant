@@ -137,7 +137,7 @@ mod tests {
   use super::*;
   use crate::{
     rule::Side,
-    rules::{Dedup, Drop, StripAnsi, Truncate},
+    rules::{Collapse, Dedup, Drop, StripAnsi, Truncate},
   };
 
   fn cap(stdout: &[u8]) -> Captured {
@@ -179,8 +179,6 @@ mod tests {
 
   #[test]
   fn run_pipe_safe_keeps_lossless_skips_lossy() {
-    use crate::rules::Collapse;
-
     let chain = RuleChain::new("t".to_string(), vec![
       Box::new(StripAnsi),
       Box::new(Collapse {
