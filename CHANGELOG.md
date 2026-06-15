@@ -6,7 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
+- **update:** Report a clear message when the GitHub API rate-limits
+
+## [0.1.6] - 2026-06-15
+
+### Bug Fixes
+
 - **agents:** Force --reduce in the hook rewrite
+
+### Documentation
+
+- Update changelog
 
 ### Miscellaneous
 
