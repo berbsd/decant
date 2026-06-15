@@ -4,9 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Bug Fixes
+
+- **update:** Correct 'unparsable' typo flagged by typos hook
+
 ### Documentation
 
 - Document decant-core and decant-metrics
+- Add MIT license
+- Add CONTRIBUTING guide
+- **cli:** Enrich --help with long_about, examples, and grouping
+- Consolidate decant README into the workspace root
 
 ### Features
 
@@ -15,10 +23,25 @@ All notable changes to this project will be documented in this file.
 - **agents:** Add agent hook integration crate
 - **store:** Add SQLite metrics store crate
 - **cli:** Add init, hook, and history subcommands
+- **update:** Add install script and self-update
+- **run:** Isatty-gated pipe-safe reduction
+- **transforms:** Add built-in configs for 8 common commands
 
 ### Miscellaneous
 
-- Vendor decant-relevant Claude skills
 - Adopt the platform .gitignore
+- **cargo:** Tidy workspace manifests
+- **dev:** Add bootstrap.sh dev-environment setup
+- Rename project org to berbsd and unify author identity
+
+### Refactoring
+
+- **errors:** Migrate library crates to thiserror
+- **transforms:** Consolidate built-ins into a BTreeMap
+- **cli:** Group subcommands under a cmd module
+
+### Styling
+
+- **toml:** Align key spacing in cliff.toml and cargo-nextest.toml
 
 
