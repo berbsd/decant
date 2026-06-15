@@ -9,6 +9,7 @@ readme               = "README.md"
 repository.workspace = true
 version.workspace    = true
 
+
 [lints]
 workspace = true
 
@@ -16,4 +17,4 @@ workspace = true
 thiserror = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
-libc = { workspace = true }
+nix = { workspace = true }
