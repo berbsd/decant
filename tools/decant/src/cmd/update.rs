@@ -177,8 +177,10 @@ fn apply_update(
 
   let archive = tmp.join(&asset);
   download(&format!("{base}/{asset}"), &archive)?;
-  let sha = tmp.join(format!("{asset}.sha256"));
-  download(&format!("{base}/{asset}.sha256"), &sha)?;
+  // The release names the checksum after the archive stem (no `.tar.gz`).
+  let sha_asset = format!("decant-{target}.sha256");
+  let sha = tmp.join(&sha_asset);
+  download(&format!("{base}/{sha_asset}"), &sha)?;
 
   verify_sha256(&archive, &sha)?;
 
@@ -369,8 +371,9 @@ mod tests {
       .mock("GET", format!("/{tag}/{asset}").as_str())
       .with_body(archive_bytes)
       .create();
+    let sha_asset = format!("decant-{target}.sha256");
     let shasum = server
-      .mock("GET", format!("/{tag}/{asset}.sha256").as_str())
+      .mock("GET", format!("/{tag}/{sha_asset}").as_str())
       .with_body(format!("{sha}  {asset}\n"))
       .create();
 

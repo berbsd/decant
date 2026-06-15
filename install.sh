@@ -49,17 +49,19 @@ main() {
   tmp=$(mktemp -d)
   trap 'rm -rf "$tmp"' EXIT
 
+  # The release names the checksum after the archive stem (no `.tar.gz`).
+  sha="$BIN-$target.sha256"
   echo "decant-install: downloading $asset ($version)"
   curl -fsSL "$base/$asset" -o "$tmp/$asset" || err "download failed: $base/$asset"
-  curl -fsSL "$base/$asset.sha256" -o "$tmp/$asset.sha256" || err "checksum download failed"
+  curl -fsSL "$base/$sha" -o "$tmp/$sha" || err "checksum download failed"
 
   echo "decant-install: verifying checksum"
   (
     cd "$tmp"
     if command -v sha256sum >/dev/null 2>&1; then
-      sha256sum -c "$asset.sha256"
+      sha256sum -c "$sha"
     elif command -v shasum >/dev/null 2>&1; then
-      shasum -a 256 -c "$asset.sha256"
+      shasum -a 256 -c "$sha"
     else
       err "no sha256sum/shasum available to verify the download"
     fi
