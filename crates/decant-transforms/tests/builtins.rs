@@ -1,5 +1,4 @@
 //! Built-in chains must meaningfully reduce real command output.
-#![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use decant_transforms::resolve;
 

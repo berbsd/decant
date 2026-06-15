@@ -44,4 +44,12 @@ mod tests {
       "RESULT ok\ntail\n"
     );
   }
+
+  #[test]
+  fn describe_shows_the_pattern() {
+    assert_eq!(
+      KeepAfter(Regex::new("RESULT").expect("re")).describe(),
+      "keep_after /RESULT/"
+    );
+  }
 }

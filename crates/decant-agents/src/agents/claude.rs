@@ -116,4 +116,11 @@ mod tests {
     );
     assert_eq!(v["hookSpecificOutput"]["hookEventName"], "PreToolUse");
   }
+
+  #[test]
+  fn passthrough_response_is_the_default_empty_object() {
+    // ClaudeAgent does not override `passthrough_response`, so this exercises
+    // the default trait method.
+    assert_eq!(ClaudeAgent.passthrough_response(), "{}");
+  }
 }

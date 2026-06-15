@@ -75,4 +75,16 @@ mod tests {
     let rule = Truncate { max_lines: 5, keep: Side::Tail };
     assert_eq!(rule.apply("1\n2\n3"), "1\n2\n3\n");
   }
+
+  #[test]
+  fn describe_names_side_and_limit() {
+    assert_eq!(
+      Truncate { max_lines: 100, keep: Side::Tail }.describe(),
+      "truncate tail 100"
+    );
+    assert_eq!(
+      Truncate { max_lines: 40, keep: Side::Head }.describe(),
+      "truncate head 40"
+    );
+  }
 }

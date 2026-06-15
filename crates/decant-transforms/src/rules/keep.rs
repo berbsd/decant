@@ -39,4 +39,12 @@ mod tests {
     let rule = Keep(Regex::new("error").expect("re"));
     assert_eq!(rule.apply("info x\nerror y\ninfo z"), "error y\n");
   }
+
+  #[test]
+  fn describe_shows_the_pattern() {
+    assert_eq!(
+      Keep(Regex::new("error").expect("re")).describe(),
+      "keep /error/"
+    );
+  }
 }
