@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file.
 - **install:** Correct checksum asset name (stem, not .tar.gz)
 - **typos:** Exclude generated CHANGELOG.md from spell-check
 
+### Documentation
+
+- Update changelog
+- **readme:** Remove Design docs section and fix a stray typo
+
 ### Miscellaneous
 
 - Bump actions to node24 versions and add Dependabot
