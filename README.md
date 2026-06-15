@@ -1,6 +1,9 @@
 # decant
 
+[![CI](https://github.com/berbsd/decant/actions/workflows/ci.yml/badge.svg)](https://github.com/berbsd/decant/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/berbsd/decant/graph/badge.svg)](https://codecov.io/gh/berbsd/decant)
+[![Release](https://img.shields.io/github/v/release/berbsd/decant)](https://github.com/berbsd/decant/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/berbsd/decant)](LICENSE)
 
 `decant` wraps a command, captures its output, and reduces it to minimize the
 tokens an LLM spends reading tool output. It strips noise, collapses repetition,
