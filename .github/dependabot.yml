@@ -9,6 +9,11 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "ci"
+    # Batch minor/patch into one PR; majors stay separate for review.
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
 
   # Cargo dependencies across the workspace
   - package-ecosystem: "cargo"
@@ -17,3 +22,8 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "build"
+    # Batch minor/patch into one PR; majors stay separate for review.
+    groups:
+      cargo:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
