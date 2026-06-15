@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation
+
+- **readme:** Add CI, release, and license badges
+
+### Features
+
+- **transforms:** Add terraform plan/apply/init built-in configs
+
+## [0.1.3] - 2026-06-15
+
+### Documentation
+
+- Update changelog
+
 ### Miscellaneous
 
 - **coverage:** Add llvm-cov + Codecov upload, badge, and tooling
@@ -73,5 +87,3 @@ All notable changes to this project will be documented in this file.
 ### Build
 
 - **bootstrap:** Install cocogitto, lefthook, and gitleaks
-
-
