@@ -109,12 +109,33 @@ fn run_with(
 
 fn fetch_latest_tag(api_base: &str) -> Result<String> {
   let url = format!("{api_base}/repos/{REPO}/releases/latest");
-  let body = ureq::get(&url)
-    .set("User-Agent", USER_AGENT)
-    .call()
-    .context("querying the GitHub releases API")?
-    .into_string()
-    .context("reading the release response")?;
+  let resp = match ureq::get(&url).set("User-Agent", USER_AGENT).call() {
+    | Ok(resp) => resp,
+    // GitHub signals an exhausted rate limit as 403 + `X-RateLimit-Remaining: 0`
+    // (not 429) — translate that into an actionable message instead of "403".
+    | Err(ureq::Error::Status(403, resp)) if resp.header("x-ratelimit-remaining") == Some("0") => {
+      let when = resp
+        .header("x-ratelimit-reset")
+        .and_then(|s| s.parse::<u64>().ok())
+        .and_then(|reset| {
+          std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .ok()
+            .map(|now| reset.saturating_sub(now.as_secs()) / 60)
+        })
+        .map_or_else(
+          || "retry later".to_string(),
+          |m| format!("retry in ~{m} min"),
+        );
+      bail!(
+        "GitHub API rate limit reached (60 requests/hour for unauthenticated requests) — {when}"
+      );
+    },
+    | Err(e) => {
+      return Err(anyhow::Error::new(e).context("querying the GitHub releases API"));
+    },
+  };
+  let body = resp.into_string().context("reading the release response")?;
   let value: serde_json::Value = serde_json::from_str(&body).context("parsing the release JSON")?;
   value
     .get("tag_name")
@@ -289,6 +310,23 @@ mod tests {
       .create();
     assert_eq!(fetch_latest_tag(&server.url()).expect("tag"), "v9.9.9");
     m.assert();
+  }
+
+  #[test]
+  fn fetch_latest_tag_reports_rate_limit_clearly() {
+    let mut server = mockito::Server::new();
+    server
+      .mock("GET", "/repos/berbsd/decant/releases/latest")
+      .with_status(403)
+      .with_header("x-ratelimit-remaining", "0")
+      .with_body("rate limited")
+      .create();
+    let err = fetch_latest_tag(&server.url()).expect_err("should error");
+    let msg = format!("{err:#}");
+    assert!(
+      msg.contains("rate limit"),
+      "expected a rate-limit message, got: {msg}"
+    );
   }
 
   #[test]
