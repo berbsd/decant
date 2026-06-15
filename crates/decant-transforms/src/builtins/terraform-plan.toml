@@ -1,0 +1,27 @@
+# `terraform plan` — drop state-refresh and unchanged-context noise, keep the
+# diff's change markers and the `Plan:` summary.
+
+[[step]]
+type = "strip_ansi"
+
+# Hundreds of "<resource>: Refreshing state..." lines collapse to one count.
+[[step]]
+type    = "collapse"
+pattern = ': Refreshing state\.\.\.'
+label   = "[refreshed {n} resources]"
+
+# Data-source reads carry no plan signal.
+[[step]]
+type    = "drop"
+pattern = ': (Reading\.\.\.|Read complete after )'
+
+# Terraform's per-block "(N unchanged attributes hidden)" notes are pure noise.
+[[step]]
+type    = "drop"
+pattern = '# \([0-9]+ unchanged .* hidden\)'
+
+# Drop deeply-nested unchanged context (16+ spaces, no +/-/~/# marker). The
+# change markers above each block are kept, so the actual diff survives.
+[[step]]
+type    = "drop"
+pattern = '^ {16,}[^ ~+#-]'

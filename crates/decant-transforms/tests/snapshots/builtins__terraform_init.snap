@@ -1,0 +1,11 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+expression: "String::from_utf8_lossy(&out)"
+---
+Initializing the backend...
+Initializing modules...
+Initializing provider plugins...
+- terraform.io/builtin/terraform is built in to Terraform
+[resolved 14 providers]
+
+Terraform has been successfully initialized!

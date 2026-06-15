@@ -1,0 +1,136 @@
+module.squadri_platform.terraform_data.topology_exclusivity_gate: Refreshing state... [id=60f2ad7c-4ff2-8852-53d2-78370909a4bb]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["calendar"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["profile"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["insight"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["auth"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["notification"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["media"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["assist"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["badge"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["project"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["chat"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["invite"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["quote"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["billing"]: Refreshing state... [id=none]
+module.squadri_platform.module.cloud_sql.random_password.db_passwords["license"]: Refreshing state... [id=none]
+module.squadri_platform.stripe_product.starter: Refreshing state... [id=prod_UWYHNMOJMmBGNl]
+module.squadri_platform.stripe_product.api_default: Refreshing state... [id=prod_UcsLVSxyQHDYWP]
+module.squadri_platform.module.night_scaler[0].data.archive_file.source: Reading...
+module.squadri_platform.stripe_product.plus: Refreshing state... [id=prod_UWYHlB2qbhHcP2]
+module.squadri_platform.module.anon_reaper[0].data.archive_file.source: Reading...
+module.squadri_platform.stripe_product.contractor_pro: Refreshing state... [id=prod_UWYHRGrgpKDCVI]
+module.squadri_platform.module.night_scaler[0].data.archive_file.source: Read complete after 0s [id=1a6d61be56315780e07666d0ce5c98db4e43edc7]
+module.squadri_platform.module.anon_reaper[0].data.archive_file.source: Read complete after 0s [id=02cf0807413cb21217d028ca3417415ad90ed18e]
+module.squadri_platform.cloudflare_dns_record.resend_spf: Refreshing state... [id=502a11e02ff2716ad53ee1dfd8e36e17]
+module.squadri_platform.cloudflare_dns_record.caa_iodef: Refreshing state... [id=eae6e0aba2627aadc17386f13ad8d97b]
+module.squadri_platform.cloudflare_bot_management.this: Refreshing state... [id=7031cc345a1a13b62ea43eadb884943a]
+module.squadri_platform.cloudflare_dns_record.resend_dkim: Refreshing state... [id=b42b37c152a62a5315346328959f5e03]
+module.squadri_platform.cloudflare_dns_record.resend_mx: Refreshing state... [id=30a34e3d55c6d3b927ddab0ecc066765]
+module.squadri_platform.data.cloudflare_zone.this: Reading...
+module.squadri_platform.stripe_webhook_endpoint.billing: Refreshing state... [id=we_1TXVAlBn5jfd9dTPRStTmbkT]
+module.squadri_platform.cloudflare_dns_record.caa_issue["letsencrypt.org"]: Refreshing state... [id=d84550228350ab650ee13fe773e24833]
+module.squadri_platform.cloudflare_dns_record.caa_issue["pki.zerossl.com"]: Refreshing state... [id=6e0576271d3a0281e52e624855505f88]
+module.squadri_platform.cloudflare_dns_record.caa_issue["pki.goog"]: Refreshing state... [id=1ae6b179fdceb8577e3fc3256a6ec846]
+module.squadri_platform.cloudflare_zone_setting.hardening["ssl"]: Refreshing state... [id=ssl]
+module.squadri_platform.cloudflare_zone_setting.hardening["automatic_https_rewrites"]: Refreshing state... [id=automatic_https_rewrites]
+
+Terraform will perform the following actions:
+
+  # module.squadri_platform.google_monitoring_dashboard.api_performance will be updated in-place
+  ~ resource "google_monitoring_dashboard" "api_performance" {
+      ~ dashboard_json = jsonencode(
+          ~ {
+              - etag         = "fdf66432265a3378217f308fe770cb2d"
+              ~ mosaicLayout = {
+                  ~ tiles   = [
+                      ~ {
+                          ~ widget = {
+                              ~ text  = {
+                                  - style   = {}
+                                    # (2 unchanged attributes hidden)
+                                }
+                              + title = ""
+                            }
+                          + yPos   = 0
+                            # (2 unchanged attributes hidden)
+                        },
+                      ~ {
+                          + xPos   = 0
+                            # (4 unchanged attributes hidden)
+                        },
+                      ~ {
+                          ~ widget = {
+                              ~ text  = {
+                                  - style   = {}
+                                    # (2 unchanged attributes hidden)
+                                }
+                              + title = ""
+                            }
+                            # (3 unchanged attributes hidden)
+                        },
+                      ~ {
+                          ~ widget = {
+                              ~ xyChart = {
+                                  ~ dataSets   = [
+                                      ~ {
+                                          - targetAxis      = "Y1"
+                                            # (3 unchanged attributes hidden)
+                                        },
+                                    ]
+                                    # (1 unchanged attribute hidden)
+                                }
+                                # (1 unchanged attribute hidden)
+                            }
+                            # (3 unchanged attributes hidden)
+                        },
+                      ~ {
+                          ~ widget = {
+                              ~ xyChart = {
+                                  ~ dataSets = [
+                                      ~ {
+                                          - targetAxis      = "Y1"
+                                            # (3 unchanged attributes hidden)
+                                        },
+                                    ]
+                                }
+                                # (1 unchanged attribute hidden)
+                            }
+                            # (4 unchanged attributes hidden)
+                        },
+                      ~ {
+                          ~ widget = {
+                              ~ xyChart = {
+                                  ~ dataSets = [
+                                      ~ {
+                                          - targetAxis      = "Y1"
+                                            # (3 unchanged attributes hidden)
+                                        },
+                                    ]
+                                }
+                                # (1 unchanged attribute hidden)
+                            }
+                            # (4 unchanged attributes hidden)
+                        },
+                      ~ {
+                          ~ widget = {
+                              ~ text  = {
+                                  - style   = {}
+                                    # (2 unchanged attributes hidden)
+                                }
+        # (1 unchanged attribute hidden)
+        id             = "projects/492399919315/dashboards/c12d29f7-b437-4fb0-921b-e3325d03ab8e"
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 21 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ deployment                = {
+      ~ timestamp   = "2026-06-13T16:33:51Z" -> (known after apply)
+        # (10 unchanged attributes hidden)
+    }
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

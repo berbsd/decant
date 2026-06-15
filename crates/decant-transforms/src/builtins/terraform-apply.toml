@@ -1,0 +1,26 @@
+# `terraform apply` — same noise as plan, plus the per-resource progress spam.
+
+[[step]]
+type = "strip_ansi"
+
+[[step]]
+type    = "collapse"
+pattern = ': Refreshing state\.\.\.'
+label   = "[refreshed {n} resources]"
+
+[[step]]
+type    = "drop"
+pattern = ': (Reading\.\.\.|Read complete after )'
+
+# "<resource>: Still creating/modifying/destroying... [Ns elapsed]" progress.
+[[step]]
+type    = "drop"
+pattern = ': Still (creating|modifying|destroying)\.\.\. \['
+
+[[step]]
+type    = "drop"
+pattern = '# \([0-9]+ unchanged .* hidden\)'
+
+[[step]]
+type    = "drop"
+pattern = '^ {16,}[^ ~+#-]'

@@ -1,0 +1,15 @@
+# `terraform init` — collapse provider resolution and drop the trailing help.
+
+[[step]]
+type = "strip_ansi"
+
+# "- Reusing/Using previously-installed/Installing/Finding <provider>..." lines.
+[[step]]
+type    = "collapse"
+pattern = '^- (Reusing|Using previously-installed|Installing|Finding) '
+label   = "[resolved {n} providers]"
+
+# The closing "You may now begin working with Terraform..." boilerplate.
+[[step]]
+type    = "drop"
+pattern = '^(You may now begin|any changes that|should now work|If you ever|rerun this command|commands will detect)'

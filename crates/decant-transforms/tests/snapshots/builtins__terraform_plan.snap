@@ -1,0 +1,64 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+expression: "String::from_utf8_lossy(&out)"
+---
+[refreshed 30 resources]
+
+Terraform will perform the following actions:
+
+  # module.squadri_platform.google_monitoring_dashboard.api_performance will be updated in-place
+  ~ resource "google_monitoring_dashboard" "api_performance" {
+      ~ dashboard_json = jsonencode(
+          ~ {
+              - etag         = "fdf66432265a3378217f308fe770cb2d"
+              ~ mosaicLayout = {
+                  ~ tiles   = [
+                      ~ {
+                          ~ widget = {
+                              ~ text  = {
+                                  - style   = {}
+                              + title = ""
+                          + yPos   = 0
+                      ~ {
+                          + xPos   = 0
+                      ~ {
+                          ~ widget = {
+                              ~ text  = {
+                                  - style   = {}
+                              + title = ""
+                      ~ {
+                          ~ widget = {
+                              ~ xyChart = {
+                                  ~ dataSets   = [
+                                      ~ {
+                                          - targetAxis      = "Y1"
+                      ~ {
+                          ~ widget = {
+                              ~ xyChart = {
+                                  ~ dataSets = [
+                                      ~ {
+                                          - targetAxis      = "Y1"
+                      ~ {
+                          ~ widget = {
+                              ~ xyChart = {
+                                  ~ dataSets = [
+                                      ~ {
+                                          - targetAxis      = "Y1"
+                      ~ {
+                          ~ widget = {
+                              ~ text  = {
+                                  - style   = {}
+        id             = "projects/492399919315/dashboards/c12d29f7-b437-4fb0-921b-e3325d03ab8e"
+    }
+
+Plan: 0 to add, 21 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ deployment                = {
+      ~ timestamp   = "2026-06-13T16:33:51Z" -> (known after apply)
+    }
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

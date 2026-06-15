@@ -127,3 +127,30 @@ fn find_chain_saves_at_least_60pct() {
   assert!(pct >= 60.0, "find savings only {pct:.1}%");
   insta::assert_snapshot!("find", String::from_utf8_lossy(&out));
 }
+
+#[test]
+fn terraform_plan_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/terraform-plan.txt");
+  let out = run_builtin(&["terraform", "plan"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "terraform plan savings only {pct:.1}%");
+  insta::assert_snapshot!("terraform_plan", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn terraform_apply_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/terraform-apply.txt");
+  let out = run_builtin(&["terraform", "apply"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "terraform apply savings only {pct:.1}%");
+  insta::assert_snapshot!("terraform_apply", String::from_utf8_lossy(&out));
+}
+
+#[test]
+fn terraform_init_chain_saves_at_least_60pct() {
+  let raw = include_bytes!("fixtures/terraform-init.txt");
+  let out = run_builtin(&["terraform", "init"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "terraform init savings only {pct:.1}%");
+  insta::assert_snapshot!("terraform_init", String::from_utf8_lossy(&out));
+}
