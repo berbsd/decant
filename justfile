@@ -66,11 +66,19 @@ changelog:
 changelog-preview:
     git cliff --unreleased
 
-# Cut a release: run checks, bump version, tag, and push (CI builds binaries).
-# level = patch | minor | major
-release level="patch":
+# Release: refresh changelog, then cargo-release checks, previews, prompts, bumps, tags, pushes (level=patch|minor|major)
+release level:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just changelog
+    git add CHANGELOG.md
+    if git diff --cached --quiet -- CHANGELOG.md; then
+      echo "changelog: unchanged"
+    else
+      git commit -m "docs: update changelog" -- CHANGELOG.md
+    fi
     cargo release {{ level }} --execute
 
 # Preview a release without changing anything (cargo-release dry-run is default)
-release-dry-run level="patch":
+release-dry-run level:
     cargo release {{ level }}
