@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
+- **agents:** Force --reduce in the hook rewrite
+
+### Miscellaneous
+
+- **dependabot:** Group minor/patch updates to cut PR noise
+
+## [0.1.5] - 2026-06-15
+
+### Bug Fixes
+
 - **install:** Correct checksum asset name (stem, not .tar.gz)
 - **typos:** Exclude generated CHANGELOG.md from spell-check
 
@@ -13,6 +23,7 @@ All notable changes to this project will be documented in this file.
 
 - Update changelog
 - **readme:** Remove Design docs section and fix a stray typo
+- Update changelog
 
 ### Miscellaneous
 
