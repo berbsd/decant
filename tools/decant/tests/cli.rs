@@ -71,7 +71,7 @@ fn hook_rewrites_a_bash_command() {
   let out = child.wait_with_output().unwrap();
   let stdout = String::from_utf8_lossy(&out.stdout);
   assert!(
-    stdout.contains("decant run -- cargo test"),
+    stdout.contains("decant run --reduce -- cargo test"),
     "stdout was: {stdout}"
   );
 }
@@ -267,5 +267,42 @@ fn history_reports_a_reduced_run() {
     String::from_utf8_lossy(&out.stdout).contains("Reduced"),
     "{:?}",
     out
+  );
+}
+
+#[test]
+fn reduce_flag_overrides_pipe_safe_when_piped() {
+  // A hook-wrapped command's stdout is captured via a pipe (non-TTY), so by
+  // default decant is pipe-safe and skips lossy rules. `--reduce` must force
+  // full reduction even when piped — this is what makes the agent path (which
+  // emits `decant run --reduce -- ...`) actually reduce. The `ls` built-in
+  // truncates at 40 lines, so 50 files distinguish the two modes.
+  let dir = tempfile::tempdir().unwrap();
+  for i in 0..50 {
+    std::fs::write(dir.path().join(format!("f{i:02}")), b"").unwrap();
+  }
+
+  // Default piped run: pipe-safe -> truncate skipped -> every line kept.
+  let safe = decant()
+    .args(["run", "--no-stats", "--", "ls", "-1"])
+    .arg(dir.path())
+    .output()
+    .unwrap();
+  assert!(
+    !String::from_utf8_lossy(&safe.stdout).contains("more lines"),
+    "piped (pipe-safe) must keep all lines: {:?}",
+    safe
+  );
+
+  // --reduce: full reduction even when piped -> truncated.
+  let reduced = decant()
+    .args(["run", "--no-stats", "--reduce", "--", "ls", "-1"])
+    .arg(dir.path())
+    .output()
+    .unwrap();
+  assert!(
+    String::from_utf8_lossy(&reduced.stdout).contains("more lines"),
+    "--reduce must truncate even when piped: {:?}",
+    reduced
   );
 }

@@ -1,8 +1,10 @@
 //! Agent-agnostic, shell-aware command rewriting.
 //!
 //! Wraps a simple command so its output flows through `decant run`, e.g.
-//! `cargo test` -> `decant run -- cargo test`. Anything it cannot safely wrap
-//! (shell pipelines, redirects, builtins) is returned unchanged.
+//! `cargo test` -> `decant run --reduce -- cargo test`. `--reduce` is forced
+//! because the agent captures stdout via a pipe (non-TTY), where decant's
+//! pipe-safe default would otherwise skip the lossy rules. Anything it cannot
+//! safely wrap (shell pipelines, redirects, builtins) is returned unchanged.
 
 use std::sync::LazyLock;
 
@@ -48,10 +50,13 @@ pub fn rewrite_command(command: &str) -> String {
 
   let env_prefix = tokens[..idx].join(" ");
   let rest = tokens[idx..].join(" ");
+  // The hook's consumer is the agent/LLM reading the captured output, so force
+  // full reduction (`--reduce`) — decant's default pipe-safe mode would skip
+  // the lossy rules because the agent captures stdout via a pipe (non-TTY).
   if env_prefix.is_empty() {
-    format!("decant run -- {rest}")
+    format!("decant run --reduce -- {rest}")
   } else {
-    format!("{env_prefix} decant run -- {rest}")
+    format!("{env_prefix} decant run --reduce -- {rest}")
   }
 }
 
@@ -61,18 +66,30 @@ mod tests {
 
   #[test]
   fn wraps_a_simple_command() {
-    assert_eq!(rewrite_command("cargo test"), "decant run -- cargo test");
+    assert_eq!(
+      rewrite_command("cargo test"),
+      "decant run --reduce -- cargo test"
+    );
+  }
+
+  #[test]
+  fn forces_reduce_so_the_agent_path_actually_reduces() {
+    // The agent reads decant's stdout via a pipe (non-TTY); without --reduce,
+    // pipe-safe mode skips the lossy rules and the LLM sees ~unreduced output.
+    // This guards the hook against silently regressing to a no-op reduction.
+    assert!(rewrite_command("terraform plan").contains(" --reduce -- "));
+    assert!(rewrite_command("FOO=1 cargo build").contains(" decant run --reduce -- "));
   }
 
   #[test]
   fn preserves_env_prefix() {
     assert_eq!(
       rewrite_command("RUST_LOG=debug cargo test"),
-      "RUST_LOG=debug decant run -- cargo test"
+      "RUST_LOG=debug decant run --reduce -- cargo test"
     );
     assert_eq!(
       rewrite_command("FOO=1 BAR=2 make"),
-      "FOO=1 BAR=2 decant run -- make"
+      "FOO=1 BAR=2 decant run --reduce -- make"
     );
   }
 
@@ -80,7 +97,7 @@ mod tests {
   fn round_trips_quoted_args() {
     assert_eq!(
       rewrite_command("git commit -m \"hello world\""),
-      "decant run -- git commit -m \"hello world\""
+      "decant run --reduce -- git commit -m \"hello world\""
     );
   }
 
