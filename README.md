@@ -130,8 +130,9 @@ tests can drive the real code paths without going through `argv`.
 ### Environment setup
 
 ```sh
-./bin/bootstrap.sh   # installs just, taplo, cargo-nextest, typos-cli,
-                     # cargo-deny, git-cliff, cargo-release, and nightly rustfmt
+./bin/bootstrap.sh   # installs just, taplo, cargo-nextest, typos-cli, cargo-deny,
+                     # git-cliff, cargo-release, cocogitto, nightly rustfmt
+                     # (+ lefthook & gitleaks via brew, for the git hooks)
 ```
 
 The toolchain is pinned to **Rust 1.95.0** (edition 2024) in

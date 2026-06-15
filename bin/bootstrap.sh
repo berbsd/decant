@@ -3,7 +3,9 @@
 #
 # Installs the toolchain components and CLI tools the workspace uses:
 #   just · taplo · cargo-nextest · typos-cli · cargo-deny · git-cliff ·
-#   cargo-release, plus nightly rustfmt (for `cargo +nightly fmt`).
+#   cargo-release · cocogitto (cog), plus nightly rustfmt (for
+#   `cargo +nightly fmt`). The git-hook runners lefthook and gitleaks are
+#   Go binaries, installed via Homebrew when available.
 #
 # Prefers cargo-binstall (prebuilt binaries) for speed, falling back to
 # `cargo install`. Re-runnable: already-installed tools are skipped.
@@ -58,13 +60,31 @@ install_tool typos typos-cli
 install_tool cargo-deny cargo-deny
 install_tool git-cliff git-cliff
 install_tool cargo-release cargo-release
+install_tool cog cocogitto          # `cog verify` runs the commit-msg hook
 
-# --- 4. Optional extras (not cargo-installable) -----------------------------
+# --- 4. Git-hook tools (Go binaries — not on crates.io) ---------------------
+# lefthook runs the hooks; gitleaks (pre-commit secret scan) and cog
+# (commit-msg, installed above) are invoked by them. Prefer Homebrew.
+if have brew; then
+  for pkg in lefthook gitleaks; do
+    if have "$pkg"; then
+      note "$pkg already installed"
+    else
+      note "installing $pkg (brew)"
+      brew install "$pkg" || note "brew install $pkg failed — install it manually"
+    fi
+  done
+else
+  have lefthook || note "lefthook not found and no brew — install it (runs the git hooks) via your package manager"
+  have gitleaks || note "gitleaks not found and no brew — install it (pre-commit secret scan) via your package manager"
+fi
+
+# --- 5. Install the hooks ---------------------------------------------------
 if have lefthook; then
   note "installing git hooks (lefthook)"
   lefthook install || true
 else
-  note "lefthook not found (optional git hooks) — install via brew/npm if wanted"
+  note "skipping hook install — lefthook not available"
 fi
 have shellcheck || note "shellcheck not found (optional, lints the shell scripts) — install via your package manager"
 

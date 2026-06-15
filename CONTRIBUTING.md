@@ -6,7 +6,7 @@ tokens an LLM spends reading tool output.
 ## Dev setup
 
 ```sh
-./bin/bootstrap.sh   # installs just, taplo, cargo-nextest, typos, cargo-deny, git-cliff, nightly rustfmt
+./bin/bootstrap.sh   # installs just, taplo, cargo-nextest, typos, cargo-deny, git-cliff, cocogitto, nightly rustfmt (+ lefthook & gitleaks via brew)
 just check           # the pre-commit gate (must be green before any commit)
 ```
 
