@@ -109,33 +109,49 @@ fn run_with(
 
 fn fetch_latest_tag(api_base: &str) -> Result<String> {
   let url = format!("{api_base}/repos/{REPO}/releases/latest");
-  let resp = match ureq::get(&url).set("User-Agent", USER_AGENT).call() {
-    | Ok(resp) => resp,
-    // GitHub signals an exhausted rate limit as 403 + `X-RateLimit-Remaining: 0`
-    // (not 429) — translate that into an actionable message instead of "403".
-    | Err(ureq::Error::Status(403, resp)) if resp.header("x-ratelimit-remaining") == Some("0") => {
-      let when = resp
-        .header("x-ratelimit-reset")
-        .and_then(|s| s.parse::<u64>().ok())
-        .and_then(|reset| {
-          std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .ok()
-            .map(|now| reset.saturating_sub(now.as_secs()) / 60)
-        })
-        .map_or_else(
-          || "retry later".to_string(),
-          |m| format!("retry in ~{m} min"),
-        );
-      bail!(
-        "GitHub API rate limit reached (60 requests/hour for unauthenticated requests) — {when}"
+  // Don't treat HTTP error status as a transport error, so we can inspect the
+  // response headers on a 403 (GitHub's rate-limit signal).
+  let mut resp = ureq::get(&url)
+    .header("User-Agent", USER_AGENT)
+    .config()
+    .http_status_as_error(false)
+    .build()
+    .call()
+    .context("querying the GitHub releases API")?;
+  let status = resp.status();
+  // GitHub signals an exhausted rate limit as 403 + `X-RateLimit-Remaining: 0`
+  // (not 429) — translate that into an actionable message instead of "403".
+  if status.as_u16() == 403
+    && resp
+      .headers()
+      .get("x-ratelimit-remaining")
+      .and_then(|v| v.to_str().ok())
+      == Some("0")
+  {
+    let when = resp
+      .headers()
+      .get("x-ratelimit-reset")
+      .and_then(|v| v.to_str().ok())
+      .and_then(|s| s.parse::<u64>().ok())
+      .and_then(|reset| {
+        std::time::SystemTime::now()
+          .duration_since(std::time::UNIX_EPOCH)
+          .ok()
+          .map(|now| reset.saturating_sub(now.as_secs()) / 60)
+      })
+      .map_or_else(
+        || "retry later".to_string(),
+        |m| format!("retry in ~{m} min"),
       );
-    },
-    | Err(e) => {
-      return Err(anyhow::Error::new(e).context("querying the GitHub releases API"));
-    },
-  };
-  let body = resp.into_string().context("reading the release response")?;
+    bail!("GitHub API rate limit reached (60 requests/hour for unauthenticated requests) — {when}");
+  }
+  if !status.is_success() {
+    bail!("querying the GitHub releases API: HTTP {}", status.as_u16());
+  }
+  let body = resp
+    .body_mut()
+    .read_to_string()
+    .context("reading the release response")?;
   let value: serde_json::Value = serde_json::from_str(&body).context("parsing the release JSON")?;
   value
     .get("tag_name")
@@ -148,11 +164,11 @@ fn download(
   url: &str,
   dest: &Path,
 ) -> Result<()> {
-  let resp = ureq::get(url)
-    .set("User-Agent", USER_AGENT)
+  let mut resp = ureq::get(url)
+    .header("User-Agent", USER_AGENT)
     .call()
     .with_context(|| format!("downloading {url}"))?;
-  let mut reader = resp.into_reader();
+  let mut reader = resp.body_mut().as_reader();
   let mut file =
     std::fs::File::create(dest).with_context(|| format!("creating {}", dest.display()))?;
   std::io::copy(&mut reader, &mut file).context("writing the download")?;
