@@ -8,7 +8,7 @@ edition    = "2024"
 license    = "MIT"
 publish    = false
 repository = "https://github.com/berbsd/decant"
-version    = "0.1.7"
+version    = "0.1.8"
 
 # =============================================================================
 # Lint Configuration
