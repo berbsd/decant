@@ -329,7 +329,7 @@ repo at `github.com/berbsd/decant` with `origin` set.
 just changelog                                                  # refresh CHANGELOG.md
 git add CHANGELOG.md && git commit -m "docs: update changelog"  # if it changed
 just release-dry-run patch                                      # preview the bump + tag
-just release patch                                             # bump, tag vX.Y.Z, push
+just release patch                                              # bump, tag vX.Y.Z, push
 ```
 
 Pushing the tag triggers `.github/workflows/release.yml`, which builds binaries
@@ -341,10 +341,3 @@ publishes, per target:
 decant-<target-triple>.tar.gz
 decant-<target-triple>.tar.gz.sha256
 ```
-
----
-
-## Design docs
-
-Architecture specs and implementation plans live under `docs/`. Start with
-`docs/superpowers/specs/2026-06-13-decant-foundation-design.md`.
