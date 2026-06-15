@@ -112,7 +112,6 @@ fn spawn_reader<R: Read + Send + 'static>(
           }
         },
         | Err(ref e) if e.kind() == std::io::ErrorKind::Interrupted => {},
-
         | Err(_) => break,
       }
     }
@@ -121,19 +120,26 @@ fn spawn_reader<R: Read + Send + 'static>(
 
 /// SIGTERM the child's process group, grace, then SIGKILL if still alive.
 #[cfg(unix)]
-#[allow(unsafe_code)] // libc process-group signalling has no safe std equivalent
 fn terminate(child: &mut Child) {
-  #[allow(clippy::cast_possible_wrap)] // a real pid always fits in pid_t
-  let pid = child.id() as libc::pid_t;
-  // Negative pid targets the whole process group.
-  unsafe {
-    libc::kill(-pid, libc::SIGTERM);
-  }
+  use nix::{
+    sys::signal::{Signal, killpg},
+    unistd::Pid,
+  };
+
+  // The child is spawned with `process_group(0)`, so it leads its own process
+  // group whose PGID equals its PID. `killpg` signals that whole group, so any
+  // grandchildren die with it. Errors (e.g. the group is already gone) are
+  // ignored — we just escalate to SIGKILL if it outlives the grace period.
+  let Ok(pgid) = i32::try_from(child.id()).map(Pid::from_raw) else {
+    return;
+  };
+
+  let _unused = killpg(pgid, Signal::SIGTERM);
+
   thread::sleep(TERM_GRACE);
+
   if !matches!(child.try_wait(), Ok(Some(_))) {
-    unsafe {
-      libc::kill(-pid, libc::SIGKILL);
-    }
+    let _unused = killpg(pgid, Signal::SIGKILL);
   }
 }
 
@@ -208,11 +214,6 @@ impl Runner for CaptureRunner {
         },
         | Err(RecvTimeoutError::Timeout) => {},
         | Err(RecvTimeoutError::Disconnected) => {
-          // Both pipes closed: the child is exiting, not hung mid-output.
-          // Refresh the idle clock so a child that closes its pipes before
-          // finishing (atexit handlers, buffer flushes) isn't misclassified
-          // as hung. The wall-clock cap still bounds a genuinely stuck
-          // post-close process.
           last_activity = Instant::now();
           thread::sleep(POLL_INTERVAL);
         },
@@ -223,19 +224,11 @@ impl Runner for CaptureRunner {
       }
       if let Some(kind) = self.expired(start, last_activity) {
         terminate(&mut child);
-        // Reap the killed child. Dropping the Result is intentional (the
-        // exit code is forced to 124 below). Note: on Linux this wait can
-        // block if the child is in uninterruptible (D-state) I/O, since
-        // SIGKILL is deferred until the I/O completes — a fundamental
-        // SIGKILL limitation, not fixable here.
         drop(child.wait());
         break Outcome::TimedOut(kind);
       }
     };
 
-    // Readers finish once the child's pipes hit EOF (it has exited / been
-    // killed). Join, then drain any bytes they read after we stopped
-    // receiving but before they observed EOF.
     drop(out_handle.join());
     drop(err_handle.join());
     while let Ok(msg) = rx.try_recv() {

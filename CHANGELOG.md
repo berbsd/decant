@@ -4,8 +4,33 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Miscellaneous
+
+- **coverage:** Add llvm-cov + Codecov upload, badge, and tooling
+
+### Refactoring
+
+- **core:** Signal the process group via nix, not unsafe libc
+
+### Testing
+
+- Raise coverage above 80% across all files
+
+## [0.1.2] - 2026-06-15
+
 ### Bug Fixes
-- none
+
+- **release:** Correct workspace message templates, pin shared-version
+
+### Miscellaneous
+
+- **release:** Publish draft only after assets upload
+
+## [0.1.1] - 2026-06-15
+
+### Bug Fixes
+
+- **update:** Correct 'unparsable' typo flagged by typos hook
 
 ### Documentation
 
@@ -14,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - Add CONTRIBUTING guide
 - **cli:** Enrich --help with long_about, examples, and grouping
 - Consolidate decant README into the workspace root
+- Update changelog
 - Update changelog
 
 ### Features

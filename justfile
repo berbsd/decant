@@ -30,6 +30,14 @@ fix:
 test:
     cargo nextest run
 
+# Code coverage summary in the terminal (llvm-cov + nextest)
+coverage:
+    cargo llvm-cov nextest
+
+# Code coverage as an HTML report, opened in the browser when done
+coverage-html:
+    cargo llvm-cov nextest --html --open
+
 # Build release binary
 build-release:
     cargo build --release

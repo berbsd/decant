@@ -18,4 +18,4 @@
 [toolchain]
 channel    = "1.95.0"
 profile    = "minimal"
-components = ["rustfmt", "clippy", "rust-src"]
+components = ["rustfmt", "clippy", "rust-src", "llvm-tools-preview"]

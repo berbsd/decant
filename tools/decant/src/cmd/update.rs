@@ -1,6 +1,12 @@
 //! `decant update` — replace the running binary with the latest GitHub release
 //! for this target. Downloads via `ureq`, verifies SHA256 in-process, extracts
 //! with `tar`, and atomically renames the new binary over the current one.
+//!
+//! Testability: the network fetch/download and binary-replacement flow are made
+//! testable by injecting the API/download endpoints and the target binary path
+//! (see `run_with` / `apply_update`). Tests drive the full flow against a mock
+//! HTTP server and a throwaway target file, so no network or real binary is
+//! touched.
 
 use std::{
   io::Write,
@@ -66,8 +72,22 @@ fn is_outdated(
 /// Returns an error if the GitHub API is unreachable, the download or checksum
 /// fails, or the binary cannot be replaced.
 pub fn run(args: &UpdateArgs) -> Result<ExitCode> {
+  let current_exe = std::env::current_exe().context("locating the current executable")?;
+  let download_base = format!("https://github.com/{REPO}/releases/download");
+  run_with(args, "https://api.github.com", &download_base, &current_exe)
+}
+
+/// The update flow with injectable endpoints and target binary, so tests can
+/// drive it against a mock HTTP server and a throwaway target file. `run`
+/// supplies the real GitHub endpoints and the running executable.
+fn run_with(
+  args: &UpdateArgs,
+  api_base: &str,
+  download_base: &str,
+  target_exe: &Path,
+) -> Result<ExitCode> {
   let current = env!("CARGO_PKG_VERSION");
-  let latest_tag = fetch_latest_tag()?;
+  let latest_tag = fetch_latest_tag(api_base)?;
   let latest = normalize_tag(&latest_tag);
 
   let mut out = std::io::stdout().lock();
@@ -81,14 +101,14 @@ pub fn run(args: &UpdateArgs) -> Result<ExitCode> {
   }
   drop(out);
 
-  apply_update(&latest_tag)?;
+  apply_update(download_base, &latest_tag, target_exe)?;
   let mut out = std::io::stdout().lock();
   writeln!(out, "decant: updated v{current} -> {latest_tag}")?;
   Ok(ExitCode::SUCCESS)
 }
 
-fn fetch_latest_tag() -> Result<String> {
-  let url = format!("https://api.github.com/repos/{REPO}/releases/latest");
+fn fetch_latest_tag(api_base: &str) -> Result<String> {
+  let url = format!("{api_base}/repos/{REPO}/releases/latest");
   let body = ureq::get(&url)
     .set("User-Agent", USER_AGENT)
     .call()
@@ -143,10 +163,14 @@ fn verify_sha256(
   Ok(())
 }
 
-fn apply_update(tag: &str) -> Result<()> {
+fn apply_update(
+  download_base: &str,
+  tag: &str,
+  target_exe: &Path,
+) -> Result<()> {
   let target = env!("DECANT_TARGET");
   let asset = asset_name(target);
-  let base = format!("https://github.com/{REPO}/releases/download/{tag}");
+  let base = format!("{download_base}/{tag}");
 
   let tmp = std::env::temp_dir().join(format!("decant-update-{tag}"));
   std::fs::create_dir_all(&tmp).context("creating the temp dir")?;
@@ -170,10 +194,9 @@ fn apply_update(tag: &str) -> Result<()> {
   }
 
   let new_bin = tmp.join("decant");
-  let current_exe = std::env::current_exe().context("locating the current executable")?;
-  // Stage beside the current binary so the final rename is same-filesystem
+  // Stage beside the target binary so the final rename is same-filesystem
   // (atomic).
-  let staged = current_exe.with_extension("new");
+  let staged = target_exe.with_extension("new");
   std::fs::copy(&new_bin, &staged).context("staging the new binary")?;
   #[cfg(unix)]
   {
@@ -181,12 +204,15 @@ fn apply_update(tag: &str) -> Result<()> {
     std::fs::set_permissions(&staged, std::fs::Permissions::from_mode(0o755))
       .context("setting permissions")?;
   }
-  std::fs::rename(&staged, &current_exe).context("replacing the binary")?;
+  std::fs::rename(&staged, target_exe).context("replacing the binary")?;
   let _unused = std::fs::remove_dir_all(&tmp);
   Ok(())
 }
 
 #[cfg(test)]
+// The mockito `Server` guard must stay alive for the duration of each test's
+// HTTP calls; `significant_drop_tightening` misreads it as droppable early.
+#[allow(clippy::significant_drop_tightening)]
 mod tests {
   use super::*;
 
@@ -218,5 +244,145 @@ mod tests {
     assert!(!is_outdated("0.2.0", "0.2.0"));
     assert!(!is_outdated("0.2.0", "0.1.0"));
     assert!(!is_outdated("0.1.0", "garbage")); // never update on unparsable
+  }
+
+  fn sha256_hex(bytes: &[u8]) -> String {
+    use std::fmt::Write as _;
+    let mut hasher = Sha256::new();
+    hasher.update(bytes);
+    let mut hex = String::with_capacity(64);
+    for byte in hasher.finalize() {
+      let _unused = write!(hex, "{byte:02x}");
+    }
+    hex
+  }
+
+  #[test]
+  fn verify_sha256_accepts_match_and_rejects_mismatch_or_empty() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let archive = dir.path().join("decant.tar.gz");
+    let sha = dir.path().join("decant.tar.gz.sha256");
+    std::fs::write(&archive, b"the archive bytes").expect("write archive");
+
+    // Matching checksum (with a trailing filename field, as shasum emits).
+    let good = sha256_hex(b"the archive bytes");
+    std::fs::write(&sha, format!("{good}  decant.tar.gz\n")).expect("write sha");
+    assert!(verify_sha256(&archive, &sha).is_ok());
+
+    // Wrong checksum is rejected.
+    std::fs::write(&sha, "deadbeef  decant.tar.gz\n").expect("write bad sha");
+    assert!(verify_sha256(&archive, &sha).is_err());
+
+    // Empty checksum file is rejected.
+    std::fs::write(&sha, "").expect("write empty sha");
+    assert!(verify_sha256(&archive, &sha).is_err());
+  }
+
+  #[test]
+  fn fetch_latest_tag_reads_tag_name() {
+    let mut server = mockito::Server::new();
+    let m = server
+      .mock("GET", "/repos/berbsd/decant/releases/latest")
+      .with_body(r#"{"tag_name":"v9.9.9"}"#)
+      .create();
+    assert_eq!(fetch_latest_tag(&server.url()).expect("tag"), "v9.9.9");
+    m.assert();
+  }
+
+  #[test]
+  fn fetch_latest_tag_errors_without_tag_name() {
+    let mut server = mockito::Server::new();
+    server
+      .mock("GET", "/repos/berbsd/decant/releases/latest")
+      .with_body(r#"{"nope":1}"#)
+      .create();
+    assert!(fetch_latest_tag(&server.url()).is_err());
+  }
+
+  #[test]
+  fn download_writes_the_response_body() {
+    let mut server = mockito::Server::new();
+    server
+      .mock("GET", "/asset")
+      .with_body("payload-bytes")
+      .create();
+    let dir = tempfile::tempdir().expect("tempdir");
+    let dest = dir.path().join("out");
+    download(&format!("{}/asset", server.url()), &dest).expect("download");
+    assert_eq!(std::fs::read(&dest).expect("read"), b"payload-bytes");
+  }
+
+  #[test]
+  fn run_with_reports_up_to_date_for_the_same_version() {
+    let tag = format!("v{}", env!("CARGO_PKG_VERSION"));
+    let mut server = mockito::Server::new();
+    server
+      .mock("GET", "/repos/berbsd/decant/releases/latest")
+      .with_body(format!(r#"{{"tag_name":"{tag}"}}"#))
+      .create();
+    let args = UpdateArgs { check: false };
+    // No download endpoints needed — it short-circuits as up to date.
+    run_with(&args, &server.url(), "unused", Path::new("/nonexistent")).expect("run_with");
+  }
+
+  #[test]
+  fn run_with_check_reports_available_without_installing() {
+    let mut server = mockito::Server::new();
+    server
+      .mock("GET", "/repos/berbsd/decant/releases/latest")
+      .with_body(r#"{"tag_name":"v999.0.0"}"#)
+      .create();
+    let args = UpdateArgs { check: true };
+    run_with(&args, &server.url(), "unused", Path::new("/nonexistent")).expect("run_with");
+  }
+
+  #[test]
+  fn run_with_performs_a_full_install_against_a_mock_server() {
+    let target = env!("DECANT_TARGET");
+    let asset = asset_name(target);
+    let tag = "v999.1.0";
+
+    // Build a real gzipped tar containing a `decant` payload file.
+    let work = tempfile::tempdir().expect("tempdir");
+    let payload = work.path().join("payload");
+    std::fs::create_dir_all(&payload).expect("mkdir");
+    std::fs::write(payload.join("decant"), b"NEW BINARY").expect("payload");
+    let archive = work.path().join(&asset);
+    let status = Command::new("tar")
+      .arg("-czf")
+      .arg(&archive)
+      .arg("-C")
+      .arg(&payload)
+      .arg("decant")
+      .status()
+      .expect("tar");
+    assert!(status.success());
+    let archive_bytes = std::fs::read(&archive).expect("read archive");
+    let sha = sha256_hex(&archive_bytes);
+
+    let mut server = mockito::Server::new();
+    let api = server
+      .mock("GET", "/repos/berbsd/decant/releases/latest")
+      .with_body(format!(r#"{{"tag_name":"{tag}"}}"#))
+      .create();
+    let gz = server
+      .mock("GET", format!("/{tag}/{asset}").as_str())
+      .with_body(archive_bytes)
+      .create();
+    let shasum = server
+      .mock("GET", format!("/{tag}/{asset}.sha256").as_str())
+      .with_body(format!("{sha}  {asset}\n"))
+      .create();
+
+    let target_exe = work.path().join("decant-installed");
+    std::fs::write(&target_exe, b"OLD BINARY").expect("write target");
+
+    let args = UpdateArgs { check: false };
+    run_with(&args, &server.url(), &server.url(), &target_exe).expect("run_with");
+
+    assert_eq!(std::fs::read(&target_exe).expect("read"), b"NEW BINARY");
+    api.assert();
+    gz.assert();
+    shasum.assert();
   }
 }

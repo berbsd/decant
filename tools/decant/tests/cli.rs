@@ -116,3 +116,156 @@ fn history_reports_a_recorded_run() {
   assert!(stdout.contains("printf"), "stdout was: {stdout}");
   assert!(stdout.contains("runs"), "stdout was: {stdout}");
 }
+
+#[test]
+fn explain_with_no_args_lists_builtins() {
+  let out = decant().args(["explain"]).output().unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  let stdout = String::from_utf8_lossy(&out.stdout);
+  assert!(stdout.contains("Built-in command configs:"), "{stdout}");
+  assert!(stdout.contains("cargo-build"), "{stdout}");
+}
+
+#[test]
+fn explain_unknown_command_is_identity() {
+  let out = decant()
+    .args(["explain", "--", "totally-unknown-xyz"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  assert!(
+    String::from_utf8_lossy(&out.stdout).contains("identity"),
+    "{:?}",
+    out
+  );
+}
+
+#[test]
+fn init_is_idempotent_on_second_run() {
+  let dir = tempfile::tempdir().unwrap();
+  decant()
+    .args(["init", "--project"])
+    .current_dir(dir.path())
+    .output()
+    .unwrap();
+  let second = decant()
+    .args(["init", "--project"])
+    .current_dir(dir.path())
+    .output()
+    .unwrap();
+  assert_eq!(second.status.code(), Some(0));
+  assert!(
+    String::from_utf8_lossy(&second.stdout).contains("already present"),
+    "{:?}",
+    second
+  );
+}
+
+#[test]
+fn init_global_scope_uses_config_dir() {
+  let dir = tempfile::tempdir().unwrap();
+  let out = decant()
+    .args(["init"]) // no --project => global scope
+    .env("CLAUDE_CONFIG_DIR", dir.path())
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  assert!(dir.path().join("settings.json").exists(), "{:?}", out);
+}
+
+#[test]
+fn init_unknown_agent_fails() {
+  let out = decant()
+    .args(["init", "--agent", "bogus", "--project"])
+    .output()
+    .unwrap();
+  assert_ne!(out.status.code(), Some(0));
+  assert!(
+    String::from_utf8_lossy(&out.stderr).contains("unknown agent"),
+    "{:?}",
+    out
+  );
+}
+
+#[test]
+fn hook_unknown_agent_emits_empty_object() {
+  let out = decant().args(["hook", "no-such-agent"]).output().unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  assert_eq!(String::from_utf8_lossy(&out.stdout).trim(), "{}");
+}
+
+#[test]
+fn hook_passes_through_non_bash_input() {
+  use std::{io::Write, process::Stdio};
+  let mut child = decant()
+    .args(["hook", "claude"])
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .spawn()
+    .unwrap();
+  child
+    .stdin
+    .take()
+    .unwrap()
+    .write_all(br#"{"tool_name":"Read","tool_input":{"file_path":"/x"}}"#)
+    .unwrap();
+  let out = child.wait_with_output().unwrap();
+  assert_eq!(String::from_utf8_lossy(&out.stdout).trim(), "{}");
+}
+
+#[test]
+fn history_empty_db_reports_no_runs() {
+  let dir = tempfile::tempdir().unwrap();
+  let db = dir.path().join("metrics.db");
+  let out = decant()
+    .env("DECANT_DB_PATH", &db)
+    .args(["history"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  assert!(
+    String::from_utf8_lossy(&out.stdout).contains("no runs recorded"),
+    "{:?}",
+    out
+  );
+}
+
+#[test]
+fn history_json_output() {
+  let dir = tempfile::tempdir().unwrap();
+  let db = dir.path().join("metrics.db");
+  let out = decant()
+    .env("DECANT_DB_PATH", &db)
+    .args(["history", "--json"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  assert!(
+    String::from_utf8_lossy(&out.stdout).contains("total_runs"),
+    "{:?}",
+    out
+  );
+}
+
+#[test]
+fn history_reports_a_reduced_run() {
+  let dir = tempfile::tempdir().unwrap();
+  let db = dir.path().join("metrics.db");
+  // `ls` has a built-in config, so its run is recorded as "reduced".
+  decant()
+    .env("DECANT_DB_PATH", &db)
+    .args(["run", "--no-stats", "--", "ls", "/"])
+    .output()
+    .unwrap();
+  let out = decant()
+    .env("DECANT_DB_PATH", &db)
+    .args(["history"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  assert!(
+    String::from_utf8_lossy(&out.stdout).contains("Reduced"),
+    "{:?}",
+    out
+  );
+}
