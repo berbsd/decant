@@ -1,6 +1,7 @@
 //! `decant run` — execute a command and emit reduced output.
 
 use std::{
+  cell::Cell,
   io::{IsTerminal, Write},
   process::{Command, ExitCode},
   time::{Duration, Instant},
@@ -8,10 +9,11 @@ use std::{
 
 use anyhow::Context;
 use clap::Args;
-use decant_core::{CaptureRunner, TimeoutKind, execute};
+use decant_core::{CaptureProgress, CaptureRunner, TimeoutKind, execute};
 use decant_metrics::measure;
 use decant_store::{ConfigKind, RunRecord};
 use decant_transforms::{ConfigSource, PipeSafe, Resolved, resolve};
+use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle};
 
 #[derive(Args)]
 #[command(
@@ -135,6 +137,56 @@ fn config_kind(source: &ConfigSource) -> ConfigKind {
   }
 }
 
+/// Delay before the capture spinner is revealed — short commands finish before
+/// this and never show one.
+const SPINNER_REVEAL_AFTER: Duration = Duration::from_secs(10);
+
+/// A [`CaptureProgress`] observer that renders a live `indicatif` spinner on
+/// stderr while a long-running command is being captured.
+///
+/// The bar starts hidden and is only revealed once capture exceeds
+/// [`SPINNER_REVEAL_AFTER`], so fast commands produce no output. `indicatif`
+/// itself draws nothing when stderr is not a terminal.
+struct Spinner {
+  pb:       ProgressBar,
+  revealed: Cell<bool>,
+}
+
+impl Spinner {
+  fn new() -> Self {
+    let pb = ProgressBar::with_draw_target(None, ProgressDrawTarget::hidden());
+    pb.set_style(
+      ProgressStyle::with_template(
+        "{spinner:.cyan} decant: capturing — [{elapsed_precise}] {bytes}",
+      )
+      .unwrap_or_else(|_| ProgressStyle::default_spinner()),
+    );
+    Self { pb, revealed: Cell::new(false) }
+  }
+}
+
+impl CaptureProgress for Spinner {
+  fn update(
+    &self,
+    bytes: usize,
+    elapsed: Duration,
+  ) {
+    if !self.revealed.get() && elapsed >= SPINNER_REVEAL_AFTER {
+      self
+        .pb
+        .set_draw_target(ProgressDrawTarget::stderr_with_hz(5));
+      self.revealed.set(true);
+    }
+    self
+      .pb
+      .set_position(u64::try_from(bytes).unwrap_or(u64::MAX));
+  }
+
+  fn finish(&self) {
+    self.pb.finish_and_clear();
+  }
+}
+
 /// Execute the `run` subcommand, returning the child's exit status.
 ///
 /// Spawns the command, captures its output via [`CaptureRunner`], applies the
@@ -170,7 +222,12 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
   let mut cmd = Command::new(program);
   cmd.args(rest);
 
-  let runner = CaptureRunner::new(opt_secs(idle_timeout), opt_secs(wall_timeout));
+  let mut runner = CaptureRunner::new(opt_secs(idle_timeout), opt_secs(wall_timeout));
+  // Show a live capture spinner only when stderr is an interactive terminal, so
+  // piped/redirected stderr stays clean (mirrors the output-mode TTY gating).
+  if std::io::stderr().is_terminal() {
+    runner = runner.with_progress(Box::new(Spinner::new()));
+  }
 
   let start = Instant::now();
   let (output, captured) = match mode {

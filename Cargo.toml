@@ -196,6 +196,7 @@ uninlined_format_args     = { level = "allow", priority = 3 }
 anyhow      = { version = "1.0.100" }
 clap        = { version = "4.6.1", features = ["derive"] }
 include_dir = { version = "0.7.4" }
+indicatif   = { version = "0.18.0" }
 nix         = { version = "0.31.3", features = ["signal"] }
 regex       = { version = "1.12.4" }
 rusqlite    = { version = "0.40.1", features = ["bundled"] }

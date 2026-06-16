@@ -17,6 +17,7 @@ use nix::{
 
 use crate::{
   error::RunError,
+  progress::CaptureProgress,
   runner::Runner,
   types::{Captured, TimeoutKind},
 };
@@ -38,6 +39,8 @@ pub struct CaptureRunner {
   pub idle_timeout:   Option<Duration>,
   /// Total wall-clock budget. `None` disables.
   pub wall_clock_cap: Option<Duration>,
+  /// Optional observer notified of byte/elapsed progress during capture.
+  progress:           Option<Box<dyn CaptureProgress>>,
 }
 
 impl CaptureRunner {
@@ -50,7 +53,21 @@ impl CaptureRunner {
     idle_timeout: Option<Duration>,
     wall_clock_cap: Option<Duration>,
   ) -> Self {
-    Self { idle_timeout, wall_clock_cap }
+    Self { idle_timeout, wall_clock_cap, progress: None }
+  }
+
+  /// Attach a [`CaptureProgress`] observer, returning the runner for chaining.
+  ///
+  /// The observer's [`update`](CaptureProgress::update) is called once per poll
+  /// tick (~every 100 ms) and [`finish`](CaptureProgress::finish) once when
+  /// capture ends.
+  #[must_use]
+  pub fn with_progress(
+    mut self,
+    progress: Box<dyn CaptureProgress>,
+  ) -> Self {
+    self.progress = Some(progress);
+    self
   }
 
   fn expired(
@@ -77,6 +94,7 @@ impl Default for CaptureRunner {
     Self {
       idle_timeout:   Some(Duration::from_secs(60)),
       wall_clock_cap: Some(Duration::from_secs(600)),
+      progress:       None,
     }
   }
 }
@@ -218,6 +236,10 @@ impl Runner for CaptureRunner {
         },
       }
 
+      if let Some(p) = &self.progress {
+        p.update(stdout_buf.len() + stderr_buf.len(), start.elapsed());
+      }
+
       if let Some(status) = child.try_wait()? {
         break Outcome::Exited(exit_code_of(status));
       }
@@ -227,6 +249,10 @@ impl Runner for CaptureRunner {
         break Outcome::TimedOut(kind);
       }
     };
+
+    if let Some(p) = &self.progress {
+      p.finish();
+    }
 
     drop(out_handle.join());
     drop(err_handle.join());
@@ -321,6 +347,48 @@ mod tests {
       "child must not be idle-killed after closing its pipes"
     );
     assert_eq!(cap.exit_code, 0);
+  }
+
+  #[test]
+  fn progress_observer_receives_updates_and_finish() {
+    use std::sync::{
+      Arc,
+      atomic::{AtomicBool, AtomicUsize, Ordering},
+    };
+
+    #[derive(Clone, Default)]
+    struct Counter {
+      updates:   Arc<AtomicUsize>,
+      max_bytes: Arc<AtomicUsize>,
+      finished:  Arc<AtomicBool>,
+    }
+    impl CaptureProgress for Counter {
+      fn update(
+        &self,
+        bytes: usize,
+        _elapsed: Duration,
+      ) {
+        self.updates.fetch_add(1, Ordering::SeqCst);
+        self.max_bytes.fetch_max(bytes, Ordering::SeqCst);
+      }
+
+      fn finish(&self) {
+        self.finished.store(true, Ordering::SeqCst);
+      }
+    }
+
+    let counter = Counter::default();
+    let runner = CaptureRunner::default().with_progress(Box::new(counter.clone()));
+    // Sleep mid-output so the poll loop ticks at least twice and observes bytes.
+    let cap = runner.run(sh("printf a; sleep 0.2; printf b")).unwrap();
+
+    assert_eq!(cap.stdout, b"ab");
+    assert!(counter.updates.load(Ordering::SeqCst) >= 1, "update fired");
+    assert!(
+      counter.max_bytes.load(Ordering::SeqCst) >= 1,
+      "observed bytes"
+    );
+    assert!(counter.finished.load(Ordering::SeqCst), "finish fired");
   }
 
   #[test]

@@ -25,6 +25,7 @@ decant-transforms = { path = "../../crates/decant-transforms" }
 
 anyhow     = { workspace = true }
 clap       = { workspace = true, features = ["derive"] }
+indicatif  = { workspace = true }
 serde_json = { workspace = true }
 sha2       = { workspace = true }
 ureq       = { workspace = true }
