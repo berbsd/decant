@@ -116,15 +116,26 @@ fn timeout_marker(
   format!("[decant: {label} timeout after {secs}s — child killed, output truncated]")
 }
 
+/// Format a run duration for the stats line: whole seconds (rounded) once it
+/// reaches a second, otherwise whole milliseconds — so `102.040413833s`
+/// becomes `102s` while fast runs stay readable as `108ms`.
+fn fmt_duration(d: Duration) -> String {
+  if d.as_secs() >= 1 {
+    format!("{}s", (d.as_millis() + 500) / 1000)
+  } else {
+    format!("{}ms", d.as_millis())
+  }
+}
+
 fn stats_line(m: &decant_metrics::Measurement) -> String {
   format!(
-    "[decant: {} -> {} bytes ({:.1}% saved), {} -> {} tokens, {:?}]",
+    "[decant: {} -> {} bytes ({:.1}% saved), {} -> {} tokens, {}]",
     m.bytes_in,
     m.bytes_out,
     m.savings_pct(),
     m.tokens_in,
     m.tokens_out,
-    m.duration
+    fmt_duration(m.duration)
   )
 }
 
@@ -317,6 +328,14 @@ mod tests {
     assert!(
       timeout_marker(TimeoutKind::WallClock, 30, 600).contains("wall-clock timeout after 600s")
     );
+  }
+
+  #[test]
+  fn fmt_duration_rounds_seconds_and_keeps_ms_for_fast_runs() {
+    assert_eq!(fmt_duration(Duration::from_millis(108)), "108ms");
+    assert_eq!(fmt_duration(Duration::from_millis(1_400)), "1s");
+    assert_eq!(fmt_duration(Duration::from_millis(1_600)), "2s");
+    assert_eq!(fmt_duration(Duration::from_nanos(102_040_413_833)), "102s");
   }
 
   #[test]
