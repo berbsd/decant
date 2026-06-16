@@ -150,7 +150,7 @@ fn config_kind(source: &ConfigSource) -> ConfigKind {
 
 /// Delay before the capture spinner is revealed — short commands finish before
 /// this and never show one.
-const SPINNER_REVEAL_AFTER: Duration = Duration::from_secs(10);
+const SPINNER_REVEAL_AFTER: Duration = Duration::from_secs(3);
 
 /// A [`CaptureProgress`] observer that renders a live `indicatif` spinner on
 /// stderr while a long-running command is being captured.
