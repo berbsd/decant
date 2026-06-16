@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features
+
+- **transforms:** Add cut and transform rules, slim terraform output
+- **core:** Live capture spinner via CaptureProgress observer
+- **run:** Round stats-line duration to whole seconds
+- **run:** Reveal capture spinner after 3s instead of 10s
+
+## [0.1.8] - 2026-06-15
+
+### Documentation
+
+- Update changelog
+
 ### Styling
 
 - **imports:** Hoist inner use statements to module level
