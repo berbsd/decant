@@ -73,3 +73,12 @@ module.squadri_platform.google_monitoring_dashboard.insight_lifecycle: Still mod
 module.squadri_platform.google_monitoring_dashboard.insight_lifecycle: Modifications complete after 34s [id=projects/492399919315/dashboards/insight_lifecycle]
 
 Apply complete! Resources: 0 added, 2 changed, 0 destroyed.
+
+Outputs:
+
+api_gateway_url = "https://api.squadri.example"
+database_config = {
+    host = "10.0.0.5"
+    port = 5432
+}
+service_account = "platform@squadri.iam.gserviceaccount.com"

@@ -1,26 +1,28 @@
-# `terraform apply` — same noise as plan, plus the per-resource progress spam.
+# `terraform apply` — you already saw the diff during `plan`, so here we keep
+# only the headline counts (`Plan:` / `Apply complete!`) and the `Outputs:`
+# block, dropping the plan diff and per-resource progress chatter.
 
 [[step]]
 type = "strip_ansi"
 
+# Hundreds of "<resource>: Refreshing state..." lines collapse to one count.
 [[step]]
 type    = "collapse"
 pattern = ': Refreshing state\.\.\.'
 label   = "[refreshed {n} resources]"
 
+# Drop the entire plan diff (and its now-orphaned header). The `Plan:` summary
+# line ends the section and is kept; the trailing `Outputs:` block is untouched.
 [[step]]
-type    = "drop"
-pattern = ': (Reading\.\.\.|Read complete after )'
+type  = "cut"
+begin = '^Terraform will perform the following actions:'
+end   = '^Plan: '
 
-# "<resource>: Still creating/modifying/destroying... [Ns elapsed]" progress.
+# Per-resource read + apply progress chatter, all carrying no end-state signal.
 [[step]]
 type    = "drop"
-pattern = ': Still (creating|modifying|destroying)\.\.\. \['
+pattern = ': (Reading\.\.\.|Read complete after |Creating\.\.\.|Modifying\.\.\.|Destroying\.\.\.|Still (creating|modifying|destroying)\.\.\. \[|(Creation|Modifications|Destruction) complete after )'
 
+# Squeeze the blank-line runs left behind by the drops above.
 [[step]]
-type    = "drop"
-pattern = '# \([0-9]+ unchanged .* hidden\)'
-
-[[step]]
-type    = "drop"
-pattern = '^ {16,}[^ ~+#-]'
+type = "dedup"

@@ -34,7 +34,27 @@ pub mod chain;
 pub mod config;
 pub mod router;
 pub mod rule;
-pub mod rules;
+pub mod rules {
+  mod collapse;
+  mod cut;
+  mod dedup;
+  mod drop;
+  mod keep;
+  mod keep_after;
+  mod strip_ansi;
+  mod transform;
+  mod truncate;
+
+  pub use collapse::Collapse;
+  pub use cut::Cut;
+  pub use dedup::Dedup;
+  pub use drop::Drop;
+  pub use keep::Keep;
+  pub use keep_after::KeepAfter;
+  pub use strip_ansi::StripAnsi;
+  pub use transform::Transform;
+  pub use truncate::Truncate;
+}
 
 pub use chain::{PipeSafe, RuleChain};
 pub use config::ConfigError;

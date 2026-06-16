@@ -4,29 +4,15 @@ expression: "String::from_utf8_lossy(&out)"
 ---
 [refreshed 30 resources]
 
-Terraform will perform the following actions:
-
-  # module.squadri_platform.google_monitoring_dashboard.api_performance will be updated in-place
-  ~ resource "google_monitoring_dashboard" "api_performance" {
-      ~ dashboard_json = jsonencode(
-          ~ {
-              - etag         = "fdf66432265a3378217f308fe770cb2d"
-              ~ mosaicLayout = {
-                  ~ tiles   = [
-                      ~ {
-                          ~ widget = {
-                              ~ text  = {
-                                  - style   = {}
-                              + title = ""
-                          + yPos   = 0
-                      ~ {
-                          + xPos   = 0
-
 Plan: 0 to add, 2 to change, 0 to destroy.
 
-module.squadri_platform.google_monitoring_dashboard.api_performance: Modifying... [id=projects/492399919315/dashboards/api_performance]
-module.squadri_platform.google_monitoring_dashboard.api_performance: Modifications complete after 34s [id=projects/492399919315/dashboards/api_performance]
-module.squadri_platform.google_monitoring_dashboard.insight_lifecycle: Modifying... [id=projects/492399919315/dashboards/insight_lifecycle]
-module.squadri_platform.google_monitoring_dashboard.insight_lifecycle: Modifications complete after 34s [id=projects/492399919315/dashboards/insight_lifecycle]
-
 Apply complete! Resources: 0 added, 2 changed, 0 destroyed.
+
+Outputs:
+
+api_gateway_url = "https://api.squadri.example"
+database_config = {
+    host = "10.0.0.5"
+    port = 5432
+}
+service_account = "platform@squadri.iam.gserviceaccount.com"

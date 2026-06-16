@@ -25,3 +25,11 @@ pattern = '# \([0-9]+ unchanged .* hidden\)'
 [[step]]
 type    = "drop"
 pattern = '^ {16,}[^ ~+#-]'
+
+# Shorten verbose resource addresses: each `module.<name>.` segment becomes a
+# compact `<name>/` path, so `module.a.module.b.res` reads as `a/b/res`. Keeps
+# which module a resource lives in while dropping the repeated `module.` literal.
+[[step]]
+type        = "transform"
+pattern     = 'module\.([\w-]+(?:\[[^\]]+\])?)\.'
+replacement = '$1/'

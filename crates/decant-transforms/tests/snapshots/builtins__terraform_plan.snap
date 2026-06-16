@@ -6,7 +6,12 @@ expression: "String::from_utf8_lossy(&out)"
 
 Terraform will perform the following actions:
 
-  # module.squadri_platform.google_monitoring_dashboard.api_performance will be updated in-place
+  # squadri_platform/night_scaler[0]/google_cloud_run_v2_service.this will be updated in-place
+  ~ resource "google_cloud_run_v2_service" "this" {
+      + launch_stage = "GA"
+    }
+
+  # squadri_platform/google_monitoring_dashboard.api_performance will be updated in-place
   ~ resource "google_monitoring_dashboard" "api_performance" {
       ~ dashboard_json = jsonencode(
           ~ {

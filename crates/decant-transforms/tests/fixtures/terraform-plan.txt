@@ -36,6 +36,11 @@ module.squadri_platform.cloudflare_zone_setting.hardening["automatic_https_rewri
 
 Terraform will perform the following actions:
 
+  # module.squadri_platform.module.night_scaler[0].google_cloud_run_v2_service.this will be updated in-place
+  ~ resource "google_cloud_run_v2_service" "this" {
+      + launch_stage = "GA"
+    }
+
   # module.squadri_platform.google_monitoring_dashboard.api_performance will be updated in-place
   ~ resource "google_monitoring_dashboard" "api_performance" {
       ~ dashboard_json = jsonencode(

@@ -19,6 +19,16 @@
 //! type = "truncate"
 //! max_lines = 50
 //! keep = "tail"   # optional; default is "tail"
+//!
+//! [[step]]
+//! type = "cut"            # drop a whole section between two markers
+//! begin = '^Terraform will perform'
+//! end = '^Plan: '         # the end line is kept
+//!
+//! [[step]]
+//! type = "transform"      # rewrite each line via regex substitution
+//! pattern = '\s*\[id=[^\]]*\]'
+//! replacement = ''        # supports $1 / ${name} backrefs
 //! ```
 
 use regex::Regex;
@@ -66,6 +76,25 @@ pub enum StepSpec {
   KeepAfter {
     /// RE2 regex; lines before the first match are discarded.
     pattern: String,
+  },
+  /// Drop a section from a `begin` match to an `end` match.
+  /// Maps to [`crate::rules::Cut`].
+  Cut {
+    /// RE2 regex marking the first line of the section (dropped).
+    begin: String,
+    /// RE2 regex marking the end of the section (kept).
+    end:   String,
+  },
+  /// Rewrite each line via a regex substitution.
+  /// Maps to [`crate::rules::Transform`].
+  Transform {
+    /// RE2 regex matched against each line; every match is replaced.
+    pattern:     String,
+    /// Replacement text; supports `$1` / `${name}` capture references.
+    replacement: String,
+    /// Match over the whole buffer instead of per line. Defaults to `false`.
+    #[serde(default)]
+    multiline:   bool,
   },
   /// Replace all matching lines with a single summary line.
   /// Maps to [`crate::rules::Collapse`].
@@ -136,6 +165,15 @@ impl StepSpec {
       | StepSpec::Drop { pattern } => Box::new(rules::Drop(compile_regex(pattern)?)),
       | StepSpec::Keep { pattern } => Box::new(rules::Keep(compile_regex(pattern)?)),
       | StepSpec::KeepAfter { pattern } => Box::new(rules::KeepAfter(compile_regex(pattern)?)),
+      | StepSpec::Cut { begin, end } => Box::new(rules::Cut {
+        begin: compile_regex(begin)?,
+        end:   compile_regex(end)?,
+      }),
+      | StepSpec::Transform { pattern, replacement, multiline } => Box::new(rules::Transform {
+        pattern: compile_regex(pattern)?,
+        replacement,
+        multiline,
+      }),
       | StepSpec::Collapse { pattern, label } => {
         Box::new(rules::Collapse { pattern: compile_regex(pattern)?, label })
       },

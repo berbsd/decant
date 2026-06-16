@@ -45,8 +45,9 @@ filename is the routing key: `decant run -- <program> <subcommand>` resolves to
 ### Steps
 
 1. **Create the TOML** at `crates/decant-transforms/src/builtins/<key>.toml`.
-   Write an ordered list of `[[step]]` tables using the 7 rules:
-   `strip_ansi`, `drop`, `keep`, `keep_after`, `collapse`, `dedup`, `truncate`.
+   Write an ordered list of `[[step]]` tables using the 9 rules:
+   `strip_ansi`, `drop`, `keep`, `keep_after`, `cut`, `collapse`, `transform`,
+   `dedup`, `truncate`.
    Use TOML **literal single-quoted strings** for `pattern` fields (no escaping
    needed). Example:
 

@@ -204,9 +204,9 @@ matters: strip ANSI first, drop/collapse noise, truncate last.
 
 ### The rule vocabulary
 
-Seven rules make up the vocabulary. Write `pattern` fields as TOML **literal
+Nine rules make up the vocabulary. Write `pattern` fields as TOML **literal
 single-quoted strings** (`'...'`) so regex backslashes need no escaping;
-patterns use the `regex` crate (RE2 syntax).
+patterns use the `regex` crate (RE2 syntax) and are matched per line.
 
 | `type` | Fields | Effect | Pipe-safe |
 |--------|--------|--------|:---------:|
@@ -215,7 +215,9 @@ patterns use the `regex` crate (RE2 syntax).
 | `drop` | `pattern` | Remove every line that matches `pattern`. | ❌ |
 | `keep` | `pattern` | Keep only lines that match `pattern` (inverse of `drop`). | ❌ |
 | `keep_after` | `pattern` | Discard everything before the first matching line; keep that line and the rest. | ❌ |
+| `cut` | `begin`, `end` | Drop a section from a `begin` match to an `end` match; the `begin` line is dropped, the `end` line is kept. Removes multiple sections; an unclosed `begin` runs to EOF. | ❌ |
 | `collapse` | `pattern`, `label` | Replace all matching lines with a single summary line; `{n}` in `label` becomes the match count. | ❌ |
+| `transform` | `pattern`, `replacement`, `multiline` | Rewrite by replacing all matches of `pattern`; `replacement` supports `$1` / `${name}` backrefs. Per line by default; set `multiline = true` to match across newlines over the whole buffer. | ❌ |
 | `truncate` | `max_lines`, `keep` | Cap output at `max_lines`, inserting a `… N more lines` marker. `keep = "tail"` (default) keeps the end; `"head"` keeps the start. | ❌ |
 
 **Pipe-safe** means the rule preserves every input line's content, so a
