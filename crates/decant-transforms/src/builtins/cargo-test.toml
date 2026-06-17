@@ -12,7 +12,11 @@ pattern = '^test .* \.\.\. ok$'
 [[step]]
 type = "dedup"
 
+# Cap at 120 lines, but rank by signal instead of position: failures, panics,
+# and compile errors are force-kept wherever they fall, so a panic buried in a
+# long run survives a cut that `truncate tail` would sever. `pattern` overrides
+# rank's generic error signal with cargo-test's failure markers.
 [[step]]
-type      = "truncate"
-max_lines = 120
-keep      = "tail"
+type    = "rank"
+budget  = 120
+pattern = 'FAILED|panicked|^failures:|^error'

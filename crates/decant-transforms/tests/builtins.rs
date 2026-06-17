@@ -47,6 +47,36 @@ fn cargo_test_chain_saves_at_least_60pct() {
 }
 
 #[test]
+fn cargo_test_chain_keeps_failures_while_compressing() {
+  // A failing run: the `FAILED` marker is buried at line 30 among 45 passing
+  // tests. The rank step must force-keep the failure signal while still hitting
+  // the savings bar — the property a positional `truncate` could not guarantee.
+  let raw = include_bytes!("fixtures/cargo-test-fail.txt");
+  let out = run_builtin(&["cargo", "test"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "cargo test (fail) savings only {pct:.1}%");
+
+  let text = String::from_utf8_lossy(&out);
+  // The failure signal survives in full.
+  assert!(
+    text.contains("reduces_buried_error ... FAILED"),
+    "lost FAILED marker"
+  );
+  assert!(text.contains("panicked at"), "lost panic line");
+  assert!(
+    text.contains("assertion `left == right` failed"),
+    "lost assertion"
+  );
+  assert!(
+    text.contains("test result: FAILED. 45 passed; 1 failed"),
+    "lost result summary"
+  );
+  // The passing chatter is gone.
+  assert!(!text.contains("case_1 ... ok"), "kept passing-test noise");
+  insta::assert_snapshot!("cargo_test_fail", text);
+}
+
+#[test]
 fn cargo_nextest_chain_saves_at_least_60pct() {
   let raw = include_bytes!("fixtures/cargo-nextest.txt");
   let out = run_builtin(&["cargo", "nextest", "run"], raw);
@@ -54,6 +84,44 @@ fn cargo_nextest_chain_saves_at_least_60pct() {
   assert!(pct >= 60.0, "cargo nextest savings only {pct:.1}%");
   let text = String::from_utf8_lossy(&out);
   insta::assert_snapshot!("cargo_nextest", text);
+}
+
+#[test]
+fn cargo_nextest_chain_keeps_failures_while_compressing() {
+  // A `FAIL` marker buried among 45 `PASS` lines plus a panic block. The rank
+  // step force-keeps the failure signal; the passing chatter is dropped.
+  let raw = include_bytes!("fixtures/cargo-nextest-fail.txt");
+  let out = run_builtin(&["cargo", "nextest", "run"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "cargo nextest (fail) savings only {pct:.1}%");
+
+  let text = String::from_utf8_lossy(&out);
+  assert!(text.contains("FAIL [   0.013s]"), "lost FAIL marker");
+  assert!(text.contains("panicked at"), "lost panic line");
+  assert!(text.contains("45 passed, 1 failed"), "lost run summary");
+  assert!(!text.contains("PASS ["), "kept passing-test noise");
+  insta::assert_snapshot!("cargo_nextest_fail", text);
+}
+
+#[test]
+fn make_chain_keeps_a_buried_error_a_tail_cut_would_drop() {
+  // 67 lines survive the drops (> the 50-line budget) and the compiler error is
+  // at the TOP, followed by a long tail of unrelated object compiles. A
+  // `truncate tail 50` would keep that tail and drop the error; rank force-keeps
+  // it by signal. This is the property the swap buys.
+  let raw = include_bytes!("fixtures/make-fail.txt");
+  let out = run_builtin(&["make"], raw);
+  let text = String::from_utf8_lossy(&out);
+  assert!(out.len() < raw.len(), "output should be reduced");
+  assert!(
+    text.contains("error: 'tok' undeclared"),
+    "the buried compiler error was dropped — rank failed to force-keep it"
+  );
+  assert!(
+    text.contains("*** [Makefile:4: all] Error 2"),
+    "lost make summary"
+  );
+  insta::assert_snapshot!("make_fail", text);
 }
 
 #[test]
@@ -72,15 +140,6 @@ fn rsync_chain_saves_at_least_60pct() {
   let pct = savings_pct(raw, &out);
   assert!(pct >= 60.0, "rsync savings only {pct:.1}%");
   insta::assert_snapshot!("rsync", String::from_utf8_lossy(&out));
-}
-
-#[test]
-fn git_status_chain_saves_at_least_60pct() {
-  let raw = include_bytes!("fixtures/git-status.txt");
-  let out = run_builtin(&["git", "status"], raw);
-  let pct = savings_pct(raw, &out);
-  assert!(pct >= 60.0, "git status savings only {pct:.1}%");
-  insta::assert_snapshot!("git_status", String::from_utf8_lossy(&out));
 }
 
 #[test]

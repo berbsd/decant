@@ -42,6 +42,9 @@ pub fn run(args: &ExplainArgs) -> anyhow::Result<ExitCode> {
   let resolved = resolve(&args.command);
   writeln!(out, "command: {}", args.command.join(" "))?;
   writeln!(out, "config:  {}", resolved.source)?;
+  if !resolved.append_args.is_empty() {
+    writeln!(out, "appends: {}", resolved.append_args.join(" "))?;
+  }
   let steps = resolved.chain.describe();
   if steps.is_empty() {
     writeln!(out, "steps:   (identity — no transforms)")?;

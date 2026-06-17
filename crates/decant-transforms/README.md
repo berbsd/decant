@@ -6,7 +6,7 @@ Rule vocabulary, TOML config loading, and per-command routing for `decant`.
 
 | Layer | Key types |
 |-------|-----------|
-| **Rules** | `StripAnsi`, `Drop`, `Keep`, `KeepAfter`, `Collapse`, `Dedup`, `Truncate` — each implements the `Rule` trait. |
+| **Rules** | `StripAnsi`, `Drop`, `Keep`, `KeepAfter`, `Cut`, `Collapse`, `Transform`, `Dedup`, `Truncate`, `Rank` — each implements the `Rule` trait. `Truncate` and `Rank` both cap output to a budget; `Rank` keeps the highest-signal lines (force-keeping errors) instead of a positional slice. |
 | **Chain** | `RuleChain` — ordered list of boxed rules; implements `decant_core::Transform`. |
 | **Config** | `load_and_compile(toml_text, name)` — parse TOML and compile it into a `RuleChain`. |
 | **Router** | `resolve(&argv)` — find the right config and return a `Resolved` (source + chain). |

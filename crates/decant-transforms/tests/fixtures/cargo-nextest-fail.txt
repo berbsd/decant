@@ -1,0 +1,58 @@
+   Compiling decant-core v0.2.0 (/work/decant/crates/decant-core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.90s
+────────────
+ Nextest run ID 0c1d2e3f-aaaa-bbbb-cccc-1234567890ab with nextest profile: default
+    Starting 46 tests across 7 binaries
+        PASS [   0.002s] decant-core core::cases::case_1
+        PASS [   0.003s] decant-core core::cases::case_2
+        PASS [   0.004s] decant-core core::cases::case_3
+        PASS [   0.005s] decant-core core::cases::case_4
+        PASS [   0.006s] decant-core core::cases::case_5
+        PASS [   0.007s] decant-core core::cases::case_6
+        PASS [   0.008s] decant-core core::cases::case_7
+        PASS [   0.009s] decant-core core::cases::case_8
+        PASS [   0.001s] decant-core core::cases::case_9
+        PASS [   0.002s] decant-core core::cases::case_10
+        PASS [   0.003s] decant-core core::cases::case_11
+        PASS [   0.004s] decant-core core::cases::case_12
+        PASS [   0.005s] decant-core core::cases::case_13
+        PASS [   0.006s] decant-core core::cases::case_14
+        PASS [   0.007s] decant-core core::cases::case_15
+        PASS [   0.008s] decant-core core::cases::case_16
+        PASS [   0.009s] decant-core core::cases::case_17
+        PASS [   0.001s] decant-core core::cases::case_18
+        PASS [   0.002s] decant-core core::cases::case_19
+        PASS [   0.003s] decant-core core::cases::case_20
+        PASS [   0.004s] decant-core core::cases::case_21
+        PASS [   0.005s] decant-core core::cases::case_22
+        FAIL [   0.013s] decant-core capture::tests::buried_failure
+        PASS [   0.006s] decant-core core::cases::case_23
+        PASS [   0.007s] decant-core core::cases::case_24
+        PASS [   0.008s] decant-core core::cases::case_25
+        PASS [   0.009s] decant-core core::cases::case_26
+        PASS [   0.001s] decant-core core::cases::case_27
+        PASS [   0.002s] decant-core core::cases::case_28
+        PASS [   0.003s] decant-core core::cases::case_29
+        PASS [   0.004s] decant-core core::cases::case_30
+        PASS [   0.005s] decant-core core::cases::case_31
+        PASS [   0.006s] decant-core core::cases::case_32
+        PASS [   0.007s] decant-core core::cases::case_33
+        PASS [   0.008s] decant-core core::cases::case_34
+        PASS [   0.009s] decant-core core::cases::case_35
+        PASS [   0.001s] decant-core core::cases::case_36
+        PASS [   0.002s] decant-core core::cases::case_37
+        PASS [   0.003s] decant-core core::cases::case_38
+        PASS [   0.004s] decant-core core::cases::case_39
+        PASS [   0.005s] decant-core core::cases::case_40
+        PASS [   0.006s] decant-core core::cases::case_41
+        PASS [   0.007s] decant-core core::cases::case_42
+        PASS [   0.008s] decant-core core::cases::case_43
+        PASS [   0.009s] decant-core core::cases::case_44
+        PASS [   0.001s] decant-core core::cases::case_45
+
+--- STDERR:              decant-core capture::tests::buried_failure ---
+thread 'capture::tests::buried_failure' panicked at crates/decant-core/src/capture.rs:88:9:
+assertion failed: reduced.contains("error[E0382]")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+   Summary [   0.451s] 46 tests run: 45 passed, 1 failed, 0 skipped

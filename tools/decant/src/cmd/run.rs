@@ -127,9 +127,20 @@ fn fmt_duration(d: Duration) -> String {
   }
 }
 
-fn stats_line(m: &decant_metrics::Measurement) -> String {
+fn stats_line(
+  m: &decant_metrics::Measurement,
+  append_args: &[String],
+) -> String {
+  // When the config rewrote the command (e.g. appended `--short`), note it: the
+  // byte/token figures reflect the already-lean output, so the real win is the
+  // rewrite, not the (≈0%) output reduction.
+  let rewrite = if append_args.is_empty() {
+    String::new()
+  } else {
+    format!("appended {} · ", append_args.join(" "))
+  };
   format!(
-    "[decant: {} -> {} bytes ({:.1}% saved), {} -> {} tokens, {}]",
+    "[decant: {rewrite}{} -> {} bytes ({:.1}% saved), {} -> {} tokens, {}]",
     m.bytes_in,
     m.bytes_out,
     m.savings_pct(),
@@ -232,6 +243,10 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
 
   let mut cmd = Command::new(program);
   cmd.args(rest);
+  // A config's `[args]` table may append flags so the tool emits lean output
+  // natively (e.g. `git status` -> `git status --short`). Empty in raw mode and
+  // when the rewrite was skipped.
+  cmd.args(&resolved.append_args);
 
   let mut runner = CaptureRunner::new(opt_secs(idle_timeout), opt_secs(wall_timeout));
   // Show a live capture spinner only when stderr is an interactive terminal, so
@@ -268,7 +283,7 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
   // Raw mode runs no transform, so "0.0% saved" would be noise. PipeSafe and
   // Full both reduce, so their stats are meaningful.
   if !no_stats && mode != OutputMode::Raw {
-    writeln!(err, "{}", stats_line(&m))?;
+    writeln!(err, "{}", stats_line(&m, &resolved.append_args))?;
   }
   err.flush()?;
 
@@ -281,7 +296,7 @@ pub fn run(args: RunArgs) -> anyhow::Result<ExitCode> {
     .to_string();
   let _unused = decant_store::record(&RunRecord {
     program:       program_base,
-    subcommand:    rest.iter().find(|a| !a.starts_with('-')).cloned(),
+    subcommand:    decant_transforms::router::subcommand_of(rest).map(str::to_string),
     raw_command:   command.join(" "),
     measurement:   m,
     exit_code:     captured.exit_code,
@@ -347,8 +362,26 @@ mod tests {
       tokens_out: 2,
       duration:   std::time::Duration::ZERO,
     };
-    let line = stats_line(&m);
+    let line = stats_line(&m, &[]);
     assert!(line.contains("100 -> 25 bytes"));
     assert!(line.contains("75.0% saved"));
+    assert!(
+      !line.contains("appended"),
+      "no rewrite note when nothing appended"
+    );
+  }
+
+  #[test]
+  fn stats_line_notes_appended_args() {
+    let m = decant_metrics::Measurement {
+      bytes_in:   757,
+      bytes_out:  757,
+      tokens_in:  42,
+      tokens_out: 42,
+      duration:   std::time::Duration::ZERO,
+    };
+    let line = stats_line(&m, &["--short".to_string()]);
+    assert!(line.contains("appended --short"), "stats line was: {line}");
+    assert!(line.contains("757 -> 757 bytes"));
   }
 }

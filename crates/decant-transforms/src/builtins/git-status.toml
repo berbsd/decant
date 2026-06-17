@@ -1,15 +1,14 @@
-[[step]]
-type = "strip_ansi"
-
-[[step]]
-type    = "drop"
-pattern = '^\s*\(use "git'
-
-[[step]]
-type    = "drop"
-pattern = '^\s*$'
-
-[[step]]
-type      = "truncate"
-max_lines = 60
-keep      = "tail"
+# Built-in reduction for `git status`.
+#
+# Routing key: `git-status` (program `git` + subcommand `status`). Flags and
+# paths are stripped when deriving the key, so `git -C <path> status` resolves
+# here too. Override per-project with `./.decant/git-status.toml` or globally
+# with `~/.config/decant/git-status.toml`.
+#
+# Rather than reduce the verbose long-form output with regex steps, this rewrites
+# the command to `git status --short`, so git emits the dense short format
+# itself. `skip_if` leaves the command untouched when the caller already chose a
+# format (`-s`, `--short`, `--porcelain`) or explicitly asked for `--long`.
+[args]
+append  = ["--short"]
+skip_if = ["-s", "--short", "--porcelain", "--long"]

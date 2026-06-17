@@ -20,7 +20,10 @@ pattern = '^\s*PASS '
 [[step]]
 type = "dedup"
 
+# Cap at 120 lines, ranking by signal: nextest's `FAIL` markers, panics, and
+# the run summary are force-kept wherever they fall, so a failure buried among
+# hundreds of passing lines survives a cut `truncate tail` would sever.
 [[step]]
-type      = "truncate"
-max_lines = 120
-keep      = "tail"
+type    = "rank"
+budget  = 120
+pattern = 'FAIL|panicked|failed|^error'

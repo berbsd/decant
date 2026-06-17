@@ -1,0 +1,57 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 121
+expression: text
+---
+make: Entering directory `/tmp/build'
+  CC src/parser.o
+… 1 more lines
+src/parser.c:142:9: error: 'tok' undeclared (first use in this function)
+  142 |         tok = next();
+      |         ^~~
+  CC mod1/obj_a.o
+  CC mod1/obj_b.o
+  CC mod1/obj_c.o
+  CC mod1/obj_d.o
+  CC mod1/obj_e.o
+  CC mod1/obj_f.o
+  CC mod2/obj_a.o
+  CC mod2/obj_b.o
+  CC mod2/obj_c.o
+  CC mod2/obj_d.o
+  CC mod2/obj_e.o
+  CC mod2/obj_f.o
+  CC mod3/obj_a.o
+  CC mod3/obj_b.o
+  CC mod3/obj_c.o
+  CC mod3/obj_d.o
+  CC mod3/obj_e.o
+  CC mod3/obj_f.o
+  CC mod4/obj_a.o
+  CC mod4/obj_b.o
+  CC mod4/obj_c.o
+  CC mod4/obj_d.o
+  CC mod4/obj_e.o
+  CC mod4/obj_f.o
+  CC mod5/obj_a.o
+  CC mod5/obj_b.o
+  CC mod5/obj_c.o
+  CC mod5/obj_d.o
+  CC mod5/obj_e.o
+  CC mod5/obj_f.o
+  CC mod6/obj_a.o
+  CC mod6/obj_b.o
+  CC mod6/obj_c.o
+  CC mod6/obj_d.o
+  CC mod6/obj_e.o
+  CC mod6/obj_f.o
+  CC mod7/obj_a.o
+  CC mod7/obj_b.o
+  CC mod7/obj_c.o
+  CC mod7/obj_d.o
+  CC mod7/obj_e.o
+  CC mod7/obj_f.o
+  CC mod8/obj_a.o
+… 16 more lines
+  CC mod10/obj_f.o
+make: *** [Makefile:4: all] Error 2

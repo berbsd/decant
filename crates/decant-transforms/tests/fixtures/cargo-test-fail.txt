@@ -1,0 +1,66 @@
+   Compiling decant-core v0.2.0 (/work/decant/crates/decant-core)
+   Compiling decant-transforms v0.2.0 (/work/decant/crates/decant-transforms)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.21s
+     Running unittests src/lib.rs (target/debug/deps/decant_core-1a2b3c4d)
+
+running 46 tests
+test core::cases::case_1 ... ok
+test core::cases::case_2 ... ok
+test core::cases::case_3 ... ok
+test core::cases::case_4 ... ok
+test core::cases::case_5 ... ok
+test core::cases::case_6 ... ok
+test core::cases::case_7 ... ok
+test core::cases::case_8 ... ok
+test core::cases::case_9 ... ok
+test core::cases::case_10 ... ok
+test core::cases::case_11 ... ok
+test core::cases::case_12 ... ok
+test core::cases::case_13 ... ok
+test core::cases::case_14 ... ok
+test core::cases::case_15 ... ok
+test core::cases::case_16 ... ok
+test core::cases::case_17 ... ok
+test core::cases::case_18 ... ok
+test core::cases::case_19 ... ok
+test core::cases::case_20 ... ok
+test core::cases::case_21 ... ok
+test core::cases::case_22 ... ok
+test core::cases::case_23 ... ok
+test core::cases::reduces_buried_error ... FAILED
+test core::cases::case_24 ... ok
+test core::cases::case_25 ... ok
+test core::cases::case_26 ... ok
+test core::cases::case_27 ... ok
+test core::cases::case_28 ... ok
+test core::cases::case_29 ... ok
+test core::cases::case_30 ... ok
+test core::cases::case_31 ... ok
+test core::cases::case_32 ... ok
+test core::cases::case_33 ... ok
+test core::cases::case_34 ... ok
+test core::cases::case_35 ... ok
+test core::cases::case_36 ... ok
+test core::cases::case_37 ... ok
+test core::cases::case_38 ... ok
+test core::cases::case_39 ... ok
+test core::cases::case_40 ... ok
+test core::cases::case_41 ... ok
+test core::cases::case_42 ... ok
+test core::cases::case_43 ... ok
+test core::cases::case_44 ... ok
+test core::cases::case_45 ... ok
+
+failures:
+
+---- core::cases::reduces_buried_error stdout ----
+thread 'core::cases::reduces_buried_error' panicked at crates/decant-core/src/lib.rs:212:9:
+assertion `left == right` failed: buried error was dropped by the tail cut
+  left: "… 40 more lines"
+ right: "error[E0382]: borrow of moved value: `output`"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+failures:
+    core::cases::reduces_buried_error
+
+test result: FAILED. 45 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s

@@ -9,7 +9,9 @@ pattern = '^make\[\d+\]:'
 type    = "drop"
 pattern = '^\s*$'
 
+# Cap at 50 lines, ranking by signal: compiler `error:` lines and make's
+# `*** Error` summary are force-kept wherever they fall (rank's built-in
+# error/fatal/failed signal covers them), so a failure is never cut by position.
 [[step]]
-type      = "truncate"
-max_lines = 50
-keep      = "tail"
+type   = "rank"
+budget = 50

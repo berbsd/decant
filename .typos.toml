@@ -10,4 +10,5 @@ extend-exclude = ["target/", "*.lock", ".claude/", "CHANGELOG.md"]
 
 [default.extend-words]
 # ISO 3166-2 state code for North Dakota — typos wants to fix it to AND.
-ND = "ND"
+ND      = "ND"
+ratatui = "ratatui"

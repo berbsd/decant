@@ -119,13 +119,18 @@ fn rsync_live_reduces() {
 // ---------------------------------------------------------------------------
 // git status
 // ---------------------------------------------------------------------------
-// Run with `color.ui=always` so the output contains ANSI escape codes that
-// the `strip_ansi` step removes, contributing to savings alongside the
-// dropped `(use "git …")` hint lines and blank lines.
+// `git status` reduces by *rewriting the command* to `git status --short`
+// rather than transforming output. This live test confirms (a) the built-in
+// appends `--short`, and (b) the short form really is smaller than the long
+// form on a real repo.
 
 #[test]
 #[ignore = "needs `git`; run with --ignored"]
 fn git_status_live_reduces() {
+  // The built-in resolves to appending --short.
+  let argv: Vec<String> = ["git", "status"].iter().map(|s| (*s).to_string()).collect();
+  assert_eq!(resolve(&argv).append_args, vec!["--short".to_string()]);
+
   let dir = tempfile::tempdir().unwrap();
   let run = |args: &[&str]| {
     Command::new("git")
@@ -142,22 +147,31 @@ fn git_status_live_reduces() {
   run(&["commit", "-qm", "init"]);
   std::fs::write(dir.path().join("a.txt"), "a\nb").unwrap();
   std::fs::write(dir.path().join("u.txt"), "u").unwrap();
-  // Stage a new file so we get the "staged" section with help hints
   std::fs::write(dir.path().join("b.txt"), "c").unwrap();
   run(&["add", "b.txt"]);
-  let raw = combined(
+
+  let long = combined(
     Command::new("git")
-      .args(["-c", "color.ui=always", "status"])
+      .args(["status"])
       .current_dir(dir.path())
       .output()
       .unwrap(),
   );
-  assert!(!raw.is_empty());
-  let reduced = reduce(&["git", "status"], &raw);
-  assert!(reduced.len() <= raw.len());
-  assert!(!reduced.is_empty());
-  let pct = savings_pct(&raw, &reduced);
-  assert!(pct >= 60.0, "git status live savings only {pct:.1}%");
+  // The rewritten command: original argv + the appended --short.
+  let short = combined(
+    Command::new("git")
+      .args(["status", "--short"])
+      .current_dir(dir.path())
+      .output()
+      .unwrap(),
+  );
+  assert!(!short.is_empty());
+  assert!(
+    short.len() < long.len(),
+    "short form ({} bytes) should be smaller than long ({} bytes)",
+    short.len(),
+    long.len(),
+  );
 }
 
 // ---------------------------------------------------------------------------

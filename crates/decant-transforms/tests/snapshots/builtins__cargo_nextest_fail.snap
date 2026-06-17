@@ -1,0 +1,14 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 103
+expression: text
+---
+    Starting 46 tests across 7 binaries
+        FAIL [   0.013s] decant-core capture::tests::buried_failure
+
+--- STDERR:              decant-core capture::tests::buried_failure ---
+thread 'capture::tests::buried_failure' panicked at crates/decant-core/src/capture.rs:88:9:
+assertion failed: reduced.contains("error[E0382]")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+   Summary [   0.451s] 46 tests run: 45 passed, 1 failed, 0 skipped

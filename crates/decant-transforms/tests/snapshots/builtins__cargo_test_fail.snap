@@ -1,0 +1,22 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 76
+expression: text
+---
+
+running 46 tests
+test core::cases::reduces_buried_error ... FAILED
+
+failures:
+
+---- core::cases::reduces_buried_error stdout ----
+thread 'core::cases::reduces_buried_error' panicked at crates/decant-core/src/lib.rs:212:9:
+assertion `left == right` failed: buried error was dropped by the tail cut
+  left: "… 40 more lines"
+ right: "error[E0382]: borrow of moved value: `output`"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+failures:
+    core::cases::reduces_buried_error
+
+test result: FAILED. 45 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s

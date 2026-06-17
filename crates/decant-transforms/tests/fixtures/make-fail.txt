@@ -1,0 +1,88 @@
+make: Entering directory `/tmp/build'
+  CC src/parser.o
+src/parser.c: In function 'parse':
+src/parser.c:142:9: error: 'tok' undeclared (first use in this function)
+  142 |         tok = next();
+      |         ^~~
+make[1]: *** [Makefile:18: src/parser.o] Error 1
+make[1]: Entering directory `/tmp/build/mod1'
+  CC mod1/obj_a.o
+  CC mod1/obj_b.o
+  CC mod1/obj_c.o
+  CC mod1/obj_d.o
+  CC mod1/obj_e.o
+  CC mod1/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod1'
+make[1]: Entering directory `/tmp/build/mod2'
+  CC mod2/obj_a.o
+  CC mod2/obj_b.o
+  CC mod2/obj_c.o
+  CC mod2/obj_d.o
+  CC mod2/obj_e.o
+  CC mod2/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod2'
+make[1]: Entering directory `/tmp/build/mod3'
+  CC mod3/obj_a.o
+  CC mod3/obj_b.o
+  CC mod3/obj_c.o
+  CC mod3/obj_d.o
+  CC mod3/obj_e.o
+  CC mod3/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod3'
+make[1]: Entering directory `/tmp/build/mod4'
+  CC mod4/obj_a.o
+  CC mod4/obj_b.o
+  CC mod4/obj_c.o
+  CC mod4/obj_d.o
+  CC mod4/obj_e.o
+  CC mod4/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod4'
+make[1]: Entering directory `/tmp/build/mod5'
+  CC mod5/obj_a.o
+  CC mod5/obj_b.o
+  CC mod5/obj_c.o
+  CC mod5/obj_d.o
+  CC mod5/obj_e.o
+  CC mod5/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod5'
+make[1]: Entering directory `/tmp/build/mod6'
+  CC mod6/obj_a.o
+  CC mod6/obj_b.o
+  CC mod6/obj_c.o
+  CC mod6/obj_d.o
+  CC mod6/obj_e.o
+  CC mod6/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod6'
+make[1]: Entering directory `/tmp/build/mod7'
+  CC mod7/obj_a.o
+  CC mod7/obj_b.o
+  CC mod7/obj_c.o
+  CC mod7/obj_d.o
+  CC mod7/obj_e.o
+  CC mod7/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod7'
+make[1]: Entering directory `/tmp/build/mod8'
+  CC mod8/obj_a.o
+  CC mod8/obj_b.o
+  CC mod8/obj_c.o
+  CC mod8/obj_d.o
+  CC mod8/obj_e.o
+  CC mod8/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod8'
+make[1]: Entering directory `/tmp/build/mod9'
+  CC mod9/obj_a.o
+  CC mod9/obj_b.o
+  CC mod9/obj_c.o
+  CC mod9/obj_d.o
+  CC mod9/obj_e.o
+  CC mod9/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod9'
+make[1]: Entering directory `/tmp/build/mod10'
+  CC mod10/obj_a.o
+  CC mod10/obj_b.o
+  CC mod10/obj_c.o
+  CC mod10/obj_d.o
+  CC mod10/obj_e.o
+  CC mod10/obj_f.o
+make[1]: Leaving directory `/tmp/build/mod10'
+make: *** [Makefile:4: all] Error 2

@@ -41,6 +41,7 @@ pub mod rules {
   mod drop;
   mod keep;
   mod keep_after;
+  mod rank;
   mod strip_ansi;
   mod transform;
   mod truncate;
@@ -51,6 +52,7 @@ pub mod rules {
   pub use drop::Drop;
   pub use keep::Keep;
   pub use keep_after::KeepAfter;
+  pub use rank::Rank;
   pub use strip_ansi::StripAnsi;
   pub use transform::Transform;
   pub use truncate::Truncate;
