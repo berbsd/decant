@@ -12,7 +12,11 @@ fn decant() -> Command {
 
 #[test]
 fn passthrough_emits_stdout_and_zero_exit() {
+  // Isolate the metrics DB: `run` records every invocation, so without this
+  // the test would pollute the user's real `~/.local/share/decant/metrics.db`.
+  let dir = tempfile::tempdir().unwrap();
   let out = decant()
+    .env("DECANT_DB_PATH", dir.path().join("metrics.db"))
     .args(["run", "--no-stats", "--", "printf", "hello"])
     .output()
     .unwrap();
@@ -22,7 +26,9 @@ fn passthrough_emits_stdout_and_zero_exit() {
 
 #[test]
 fn propagates_child_exit_code() {
+  let dir = tempfile::tempdir().unwrap();
   let out = decant()
+    .env("DECANT_DB_PATH", dir.path().join("metrics.db"))
     .args(["run", "--no-stats", "--", "sh", "-c", "exit 7"])
     .output()
     .unwrap();
@@ -31,7 +37,9 @@ fn propagates_child_exit_code() {
 
 #[test]
 fn idle_timeout_kills_and_returns_124() {
+  let dir = tempfile::tempdir().unwrap();
   let out = decant()
+    .env("DECANT_DB_PATH", dir.path().join("metrics.db"))
     .args(["run", "--idle-timeout", "1", "--", "sh", "-c", "sleep 5"])
     .output()
     .unwrap();
@@ -53,6 +61,21 @@ fn explain_lists_builtin_chain() {
     "stdout was: {stdout}"
   );
   assert!(stdout.contains("collapse"), "stdout was: {stdout}");
+}
+
+#[test]
+fn explain_shows_args_append_for_git_status() {
+  let out = decant()
+    .args(["explain", "--", "git", "status"])
+    .output()
+    .unwrap();
+  assert_eq!(out.status.code(), Some(0));
+  let stdout = String::from_utf8_lossy(&out.stdout);
+  assert!(
+    stdout.contains("built-in git-status"),
+    "stdout was: {stdout}"
+  );
+  assert!(stdout.contains("appends: --short"), "stdout was: {stdout}");
 }
 
 #[test]
@@ -281,9 +304,14 @@ fn reduce_flag_overrides_pipe_safe_when_piped() {
   for i in 0..50 {
     std::fs::write(dir.path().join(format!("f{i:02}")), b"").unwrap();
   }
+  // Separate tempdir for the metrics DB so `run` doesn't pollute the real DB
+  // and the listed directory stays exactly 50 files.
+  let db_dir = tempfile::tempdir().unwrap();
+  let db = db_dir.path().join("metrics.db");
 
   // Default piped run: pipe-safe -> truncate skipped -> every line kept.
   let safe = decant()
+    .env("DECANT_DB_PATH", &db)
     .args(["run", "--no-stats", "--", "ls", "-1"])
     .arg(dir.path())
     .output()
@@ -296,6 +324,7 @@ fn reduce_flag_overrides_pipe_safe_when_piped() {
 
   // --reduce: full reduction even when piped -> truncated.
   let reduced = decant()
+    .env("DECANT_DB_PATH", &db)
     .args(["run", "--no-stats", "--reduce", "--", "ls", "-1"])
     .arg(dir.path())
     .output()
