@@ -446,7 +446,7 @@ dependencies = [
 
 [[package]]
 name = "decant"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -467,7 +467,7 @@ dependencies = [
 
 [[package]]
 name = "decant-agents"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "regex",
  "serde_json",
@@ -477,7 +477,7 @@ dependencies = [
 
 [[package]]
 name = "decant-core"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "nix 0.31.3",
  "thiserror 2.0.18",
@@ -485,7 +485,7 @@ dependencies = [
 
 [[package]]
 name = "decant-dashboard"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "decant-store",
  "ratatui",
@@ -493,11 +493,11 @@ dependencies = [
 
 [[package]]
 name = "decant-metrics"
-version = "0.3.0"
+version = "0.3.1"
 
 [[package]]
 name = "decant-store"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "decant-metrics",
  "rusqlite",
@@ -507,7 +507,7 @@ dependencies = [
 
 [[package]]
 name = "decant-transforms"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "decant-core",
  "include_dir",
