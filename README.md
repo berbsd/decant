@@ -227,7 +227,7 @@ patterns use the `regex` crate (RE2 syntax) and are matched per line.
 | `collapse` | `pattern`, `label` | Replace all matching lines with a single summary line; `{n}` in `label` becomes the match count. | ❌ |
 | `transform` | `pattern`, `replacement`, `multiline` | Rewrite by replacing all matches of `pattern`; `replacement` supports `$1` / `${name}` backrefs. Per line by default; set `multiline = true` to match across newlines over the whole buffer. | ❌ |
 | `truncate` | `max_lines`, `keep` | Cap output at `max_lines`, inserting a `… N more lines` marker. `keep = "tail"` (default) keeps the end; `"head"` keeps the start. | ❌ |
-| `rank` | `budget`, `head`, `tail`, `pattern` | Keep the highest-signal lines within `budget` *by importance, not position*: error/panic/failure lines are force-kept (so a buried failure survives), as are the first `head` and last `tail` lines (default 2 each); the rest of the budget fills by priority and dropped runs become `… N more lines`. `pattern` overrides the force-keep regex (e.g. `'FAILED|panicked'`). | ❌ |
+| `rank` | `budget`, `head`, `tail`, `pattern` | Keep the highest-signal lines within `budget` *by importance, not position*: error/panic/failure lines are force-kept (so a buried failure survives), as are the first `head` and last `tail` lines (default 2 each); the rest of the budget fills by priority and dropped runs become `… N more lines`. `pattern` overrides the force-keep regex (e.g. `'FAILED or panicked'`). | ❌ |
 
 **Pipe-safe** means the rule preserves every input line's content, so a
 downstream `grep`/`awk` still sees the same matches. Lossy rules (everything
