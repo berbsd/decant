@@ -65,6 +65,7 @@ To build and install from source: `cargo install --path tools/decant`.
 | `init`     | Install decant's hook into an agent's settings (global, or `--project`). |
 | `hook`     | The runtime hook processor an agent invokes — not run by hand. |
 | `history`  | Report recorded savings per command from the SQLite store. |
+| `dashboard`| Interactive terminal view of recorded savings (live `--watch`). Requires a TTY; for scripting use `history --json`. |
 | `update`   | Replace the running binary with the latest release. |
 
 ### `run` flags
@@ -81,8 +82,8 @@ To build and install from source: `cargo install --path tools/decant`.
 
 By default decant reduces **only when stdout is an interactive terminal**. When
 its output is piped or redirected, it switches to *pipe-safe* mode: it still
-strips ANSI codes and de-dups, but never drops, collapses, or truncates lines —
-so a downstream `grep`/`awk`/`wc` sees every line.
+strips ANSI codes and de-dups, but never drops, collapses, truncates, or ranks
+lines — so a downstream `grep`/`awk`/`wc` sees every line.
 
 ```bash
 decant run -- cargo build                 # full reduction (terminal)
@@ -97,6 +98,7 @@ decant run --raw    -- cargo test         # bypass all transforms
 decant explain cargo build   # show the resolved config source and rule chain
 decant explain               # list every command with a built-in config
 decant history               # recent runs and their reduction savings
+decant dashboard             # same savings as a scrollable TUI (add --watch for live)
 ```
 
 ---
@@ -115,6 +117,7 @@ decant/
 │   │   └── src/builtins/         #   embedded <key>.toml configs (the "targets")
 │   ├── decant-metrics/           # byte/token reduction measurement
 │   ├── decant-store/             # SQLite metrics persistence (decant history)
+│   ├── decant-dashboard/         # ratatui rendering for the decant dashboard TUI
 │   └── decant-agents/            # agent hook integration (decant init / hook)
 ├── bin/bootstrap.sh              # dev environment setup
 ├── justfile                      # task runner (just check / test / fmt / release)
@@ -168,8 +171,10 @@ A run flows through three seams:
 
 **Routing key.** The key is derived from argv, most specific first:
 `program-subcommand`, then `program`. `program` is the basename of argv[0] and
-`subcommand` is the first non-flag argument. So `cargo build` tries
-`cargo-build`, then `cargo`.
+`subcommand` is the first bare sub-verb — the first argument that is not a flag,
+a path, or a `key=value` token, so a flag's value is skipped rather than
+mistaken for the subcommand. So `cargo build` tries `cargo-build`, then `cargo`,
+and `git -C /repo status` correctly resolves `git-status` (not the `-C` path).
 
 **Resolution order** (first match wins; on any error decant warns to stderr and
 falls back to identity passthrough — output is never blocked):
@@ -181,8 +186,10 @@ falls back to identity passthrough — output is never blocked):
 4. identity passthrough                       no config found → raw output
 ```
 
-A config is just an ordered list of `[[step]]` tables. Each step has a `type`
-that selects a rule:
+A config is an optional `[args]` table (which rewrites the command before it
+runs — see [below](#rewriting-the-command-args)) followed by an ordered list of
+`[[step]]` tables that transform the output. Each step has a `type` that selects
+a rule:
 
 ```toml
 [[step]]
@@ -200,11 +207,12 @@ keep      = "tail"   # optional; default is "tail"
 ```
 
 Each rule receives the full text produced by the previous step, so order
-matters: strip ANSI first, drop/collapse noise, truncate last.
+matters: strip ANSI first, drop/collapse noise, cap last (with `truncate` or
+`rank` — see below).
 
 ### The rule vocabulary
 
-Nine rules make up the vocabulary. Write `pattern` fields as TOML **literal
+Ten rules make up the vocabulary. Write `pattern` fields as TOML **literal
 single-quoted strings** (`'...'`) so regex backslashes need no escaping;
 patterns use the `regex` crate (RE2 syntax) and are matched per line.
 
@@ -219,6 +227,7 @@ patterns use the `regex` crate (RE2 syntax) and are matched per line.
 | `collapse` | `pattern`, `label` | Replace all matching lines with a single summary line; `{n}` in `label` becomes the match count. | ❌ |
 | `transform` | `pattern`, `replacement`, `multiline` | Rewrite by replacing all matches of `pattern`; `replacement` supports `$1` / `${name}` backrefs. Per line by default; set `multiline = true` to match across newlines over the whole buffer. | ❌ |
 | `truncate` | `max_lines`, `keep` | Cap output at `max_lines`, inserting a `… N more lines` marker. `keep = "tail"` (default) keeps the end; `"head"` keeps the start. | ❌ |
+| `rank` | `budget`, `head`, `tail`, `pattern` | Keep the highest-signal lines within `budget` *by importance, not position*: error/panic/failure lines are force-kept (so a buried failure survives), as are the first `head` and last `tail` lines (default 2 each); the rest of the budget fills by priority and dropped runs become `… N more lines`. `pattern` overrides the force-keep regex (e.g. `'FAILED|panicked'`). | ❌ |
 
 **Pipe-safe** means the rule preserves every input line's content, so a
 downstream `grep`/`awk` still sees the same matches. Lossy rules (everything
@@ -226,6 +235,52 @@ except `strip_ansi` and `dedup`) are skipped automatically in pipe-safe mode.
 This is enforced by the `Rule::preserves_lines` method, which **defaults to
 `false`** — a new rule is assumed lossy until it proves otherwise, so adding one
 can never silently hide piped output.
+
+#### Capping output: `truncate` vs `rank`
+
+`truncate` and `rank` do the **same job** — cap a long output to a line budget —
+and occupy the **same final slot** in a chain. They differ only in *which* lines
+they drop when the output is over budget:
+
+- `truncate tail N` keeps the **last N lines** (positional). An error earlier in
+  the output is dropped.
+- `rank budget N` keeps the **N highest-signal lines** — error/panic/failure
+  lines are force-kept wherever they fall, so a buried failure survives.
+
+Use **one or the other, never both**: they enforce the same cap, so a `truncate`
+after a `rank` would re-cut positionally and undo rank's protection (and a
+`rank` after a `truncate` only sees the lines `truncate` already kept). `rank` is
+a smarter drop-in *replacement* for `truncate`, not a guard layered on top of it.
+
+Prefer **`rank`** when a failure can appear anywhere in the output (compiler and
+test runs — `cargo-test`, `cargo-nextest`, `make`). Prefer **`truncate`** when
+the output is uniform or already ordered so position is meaningful (`git log`
+newest-first, `ls`, `find`, `du`). Both are no-ops when the output already fits
+within the budget, so the choice only matters once something has to be cut.
+
+### Rewriting the command (`[args]`)
+
+The `[[step]]` rules above transform a command's *output*. The optional `[args]`
+table instead rewrites the command's *arguments* before it runs, so the tool can
+be asked to produce lean output itself — often denser than any output rule could
+achieve. The built-in `git-status` config uses it to turn `git status` into
+`git status --short`:
+
+```toml
+[args]
+append  = ["--short"]
+skip_if = ["-s", "--short", "--porcelain", "--long"]
+```
+
+| Field | Effect |
+|-------|--------|
+| `append` | Tokens appended to the command's argv before it is spawned. |
+| `skip_if` | If **any** of these tokens already appears in the command, the append is skipped — the caller already chose a format. Defaults to `append`, so a flag is never added twice. |
+
+`decant explain -- git status` shows the resolved rewrite as an `appends:` line,
+and the `[decant: …]` stats line notes `appended --short` at run time. Because
+the captured output is already lean, such a config reports ≈0% *output* savings —
+the real win is that the verbose form is never produced.
 
 ### Adding a new target (built-in config)
 
