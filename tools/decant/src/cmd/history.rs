@@ -81,5 +81,72 @@ fn print_report(
       writeln!(out, "  {:<28} {:>5}x", s.command, s.count)?;
     }
   }
+  if !summary.by_config.is_empty() {
+    writeln!(out, "\nBy config source (tokens):")?;
+    for c in &summary.by_config {
+      writeln!(
+        out,
+        "  {:<10} {:>5}x  {} → {}  {:>5.1}% saved",
+        c.source.label(),
+        c.count,
+        c.tokens_in,
+        c.tokens_out,
+        c.token_savings_pct()
+      )?;
+    }
+  }
   Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+  use decant_store::{ConfigKind, ConfigStat, Summary};
+
+  use super::print_report;
+
+  fn tier(
+    source: ConfigKind,
+    count: u64,
+    tin: u64,
+    tout: u64,
+  ) -> ConfigStat {
+    ConfigStat {
+      source,
+      count,
+      bytes_in: tin * 4,
+      bytes_out: tout * 4,
+      tokens_in: tin,
+      tokens_out: tout,
+    }
+  }
+
+  #[test]
+  fn report_shows_config_source_breakdown_in_tokens() {
+    let summary = Summary {
+      total_runs:       147,
+      total_bytes_in:   0,
+      total_bytes_out:  0,
+      total_tokens_in:  191_000,
+      total_tokens_out: 79_000,
+      reduced:          Vec::new(),
+      opportunities:    Vec::new(),
+      by_config:        vec![
+        tier(ConfigKind::Builtin, 130, 148_246, 36_866),
+        tier(ConfigKind::Identity, 17, 42_761, 42_761),
+      ],
+    };
+    let mut buf = Vec::new();
+    print_report(&mut buf, &summary).ok();
+    let text = String::from_utf8(buf).unwrap_or_default();
+    assert!(
+      text.contains("By config source"),
+      "missing section in:\n{text}"
+    );
+    assert!(text.contains("builtin"), "missing tier in:\n{text}");
+    assert!(
+      text.contains("148246 → 36866"),
+      "missing token flow in:\n{text}"
+    );
+    assert!(text.contains("75."), "missing tier pct in:\n{text}");
+  }
 }
