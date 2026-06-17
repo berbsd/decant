@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Features
+
+- **builtins:** Rank cargo-build output instead of truncating
+
+## [0.3.1] - 2026-06-17
+
+### Documentation
+
+- Update changelog
+
 ## [0.3.0] - 2026-06-17
 
 ### Documentation
