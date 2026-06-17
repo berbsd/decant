@@ -19,8 +19,11 @@ check:
 
 # Format all code (Rust + TOML)
 fmt:
+    @echo "Formatting Rust files..."
     @cargo +nightly fmt --all
+    @echo "Formatting TOML files..."
     @RUST_LOG="warn" taplo format
+    @echo "Done!"
 
 # Clippy with automatic fixes
 fix:
