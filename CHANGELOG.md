@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation
+
+- Document rank, the [args] directive, and the dashboard
+
+### Features
+
+- **transforms:** Add rank rule and [args] command rewrite
+- **store:** Enrich history metrics and aggregate noisy commands
+- **dashboard:** Add interactive savings TUI
+- **history:** Show per-config-source token breakdown
+
+### Miscellaneous
+
+- Echo progress steps in `just fmt`
+
+### Testing
+
+- **cli:** Isolate metrics DB and cover [args] append
+
+## [0.2.0] - 2026-06-16
+
+### Documentation
+
+- Update changelog
+
 ### Features
 
 - **transforms:** Add cut and transform rules, slim terraform output
