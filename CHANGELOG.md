@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2026-06-17
 
 ### Documentation
 
 - Document rank, the [args] directive, and the dashboard
+- Update changelog
 
 ### Features
 
