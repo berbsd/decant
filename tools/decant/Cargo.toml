@@ -19,6 +19,7 @@ path = "src/main.rs"
 [dependencies]
 decant-agents     = { path = "../../crates/decant-agents" }
 decant-core       = { path = "../../crates/decant-core" }
+decant-dashboard  = { path = "../../crates/decant-dashboard" }
 decant-metrics    = { path = "../../crates/decant-metrics" }
 decant-store      = { path = "../../crates/decant-store" }
 decant-transforms = { path = "../../crates/decant-transforms" }
@@ -26,6 +27,7 @@ decant-transforms = { path = "../../crates/decant-transforms" }
 anyhow     = { workspace = true }
 clap       = { workspace = true, features = ["derive"] }
 indicatif  = { workspace = true }
+ratatui    = { workspace = true }
 serde_json = { workspace = true }
 sha2       = { workspace = true }
 ureq       = { workspace = true }

@@ -4,8 +4,8 @@
 use clap::{Parser, Subcommand};
 
 use crate::cmd::{
-  explain::ExplainArgs, history::HistoryArgs, hook::HookArgs, init::InitArgs, run::RunArgs,
-  update::UpdateArgs,
+  dashboard::DashboardArgs, explain::ExplainArgs, history::HistoryArgs, hook::HookArgs,
+  init::InitArgs, run::RunArgs, update::UpdateArgs,
 };
 
 /// Top-level CLI struct parsed from `std::env::args`.
@@ -68,6 +68,13 @@ pub enum Commands {
   /// frequently-run commands that have no config yet ("opportunities"). Filter
   /// by time or project, or emit JSON for further processing.
   History(HistoryArgs),
+  /// Interactive terminal dashboard of recorded savings.
+  ///
+  /// Renders the same metrics as `history` as a full-screen, scrollable view:
+  /// headline token savings, a daily trend sparkline, the top reduced commands,
+  /// and unconfigured "opportunity" commands. Requires a terminal; add
+  /// `--watch` to refresh live as new runs land.
+  Dashboard(DashboardArgs),
   /// Update decant to the latest release.
   ///
   /// Downloads the release for this target, verifies its SHA256 in-process,

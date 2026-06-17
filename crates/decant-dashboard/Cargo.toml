@@ -1,0 +1,18 @@
+[package]
+authors.workspace    = true
+description          = "Terminal dashboard rendering for decant savings"
+edition.workspace    = true
+license.workspace    = true
+name                 = "decant-dashboard"
+publish.workspace    = true
+readme               = "README.md"
+repository.workspace = true
+version.workspace    = true
+
+[lints]
+workspace = true
+
+[dependencies]
+decant-store = { path = "../decant-store" }
+
+ratatui = { workspace = true }

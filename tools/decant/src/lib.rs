@@ -17,6 +17,7 @@
 
 mod cli;
 pub mod cmd {
+  pub mod dashboard;
   pub mod explain;
   pub mod history;
   pub mod hook;
@@ -51,6 +52,7 @@ pub fn dispatch(cli: Cli) -> ExitCode {
     | Commands::Init(args) => cmd::init::run(args),
     | Commands::Hook(args) => cmd::hook::run(args),
     | Commands::History(args) => cmd::history::run(args),
+    | Commands::Dashboard(args) => cmd::dashboard::run(args),
     | Commands::Update(ref args) => cmd::update::run(args),
   };
   match result {

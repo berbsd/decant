@@ -198,6 +198,7 @@ clap        = { version = "4.6.1", features = ["derive"] }
 include_dir = { version = "0.7.4" }
 indicatif   = { version = "0.18.0" }
 nix         = { version = "0.31.3", features = ["signal"] }
+ratatui     = { version = "0.30.1" }
 regex       = { version = "1.12.4" }
 rusqlite    = { version = "0.40.1", features = ["bundled"] }
 serde       = { version = "1.0.228", features = ["derive"] }
