@@ -10,7 +10,10 @@ label   = "{n} crates compiled"
 type    = "drop"
 pattern = '^\s*Finished '
 
+# Cap at 100 lines, ranking by signal: compile `error[...]` / `error:` lines and
+# `warning:` diagnostics are force-kept wherever they fall, so a failure is never
+# cut by position. `pattern` keeps both errors and warnings (a build's signal).
 [[step]]
-type      = "truncate"
-max_lines = 100
-keep      = "tail"
+type    = "rank"
+budget  = 100
+pattern = '^error|^warning:'

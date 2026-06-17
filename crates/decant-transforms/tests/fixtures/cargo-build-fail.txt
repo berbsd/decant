@@ -1,0 +1,39 @@
+   Compiling dep_1 v1.0.0 (https://github.com/x/dep_1)
+   Compiling dep_2 v1.0.0 (https://github.com/x/dep_2)
+   Compiling dep_3 v1.0.0 (https://github.com/x/dep_3)
+   Compiling dep_4 v1.0.0 (https://github.com/x/dep_4)
+   Compiling dep_5 v1.0.0 (https://github.com/x/dep_5)
+   Compiling dep_6 v1.0.0 (https://github.com/x/dep_6)
+   Compiling dep_7 v1.0.0 (https://github.com/x/dep_7)
+   Compiling dep_8 v1.0.0 (https://github.com/x/dep_8)
+   Compiling dep_9 v1.0.0 (https://github.com/x/dep_9)
+   Compiling dep_10 v1.0.0 (https://github.com/x/dep_10)
+   Compiling dep_11 v1.0.0 (https://github.com/x/dep_11)
+   Compiling dep_12 v1.0.0 (https://github.com/x/dep_12)
+   Compiling dep_13 v1.0.0 (https://github.com/x/dep_13)
+   Compiling dep_14 v1.0.0 (https://github.com/x/dep_14)
+   Compiling dep_15 v1.0.0 (https://github.com/x/dep_15)
+   Compiling dep_16 v1.0.0 (https://github.com/x/dep_16)
+   Compiling dep_17 v1.0.0 (https://github.com/x/dep_17)
+   Compiling dep_18 v1.0.0 (https://github.com/x/dep_18)
+   Compiling dep_19 v1.0.0 (https://github.com/x/dep_19)
+   Compiling dep_20 v1.0.0 (https://github.com/x/dep_20)
+   Compiling dep_21 v1.0.0 (https://github.com/x/dep_21)
+   Compiling dep_22 v1.0.0 (https://github.com/x/dep_22)
+   Compiling dep_23 v1.0.0 (https://github.com/x/dep_23)
+   Compiling dep_24 v1.0.0 (https://github.com/x/dep_24)
+   Compiling dep_25 v1.0.0 (https://github.com/x/dep_25)
+   Compiling dep_26 v1.0.0 (https://github.com/x/dep_26)
+   Compiling dep_27 v1.0.0 (https://github.com/x/dep_27)
+   Compiling dep_28 v1.0.0 (https://github.com/x/dep_28)
+   Compiling myapp v0.1.0 (/work/myapp)
+error[E0382]: borrow of moved value: `config`
+  --> src/main.rs:42:20
+   |
+40 |     let owned = config;
+   |                 ------ value moved here
+42 |     println!("{}", config);
+   |                    ^^^^^^ value borrowed here after move
+
+For more information about this error, try `rustc --explain E0382`.
+error: could not compile `myapp` (bin "myapp") due to 1 previous error

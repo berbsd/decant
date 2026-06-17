@@ -1,0 +1,16 @@
+---
+source: crates/decant-transforms/tests/builtins.rs
+assertion_line: 58
+expression: text
+---
+29 crates compiled
+error[E0382]: borrow of moved value: `config`
+  --> src/main.rs:42:20
+   |
+40 |     let owned = config;
+   |                 ------ value moved here
+42 |     println!("{}", config);
+   |                    ^^^^^^ value borrowed here after move
+
+For more information about this error, try `rustc --explain E0382`.
+error: could not compile `myapp` (bin "myapp") due to 1 previous error

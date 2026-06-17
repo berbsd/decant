@@ -37,6 +37,28 @@ fn cargo_build_chain_saves_at_least_60pct() {
 }
 
 #[test]
+fn cargo_build_chain_keeps_errors_while_compressing() {
+  // A failing build: 28 `Compiling` lines collapse away, and the `error[E0382]`
+  // plus the `could not compile` summary are force-kept by rank's pattern.
+  let raw = include_bytes!("fixtures/cargo-build-fail.txt");
+  let out = run_builtin(&["cargo", "build"], raw);
+  let pct = savings_pct(raw, &out);
+  assert!(pct >= 60.0, "cargo build (fail) savings only {pct:.1}%");
+
+  let text = String::from_utf8_lossy(&out);
+  assert!(
+    text.contains("error[E0382]: borrow of moved value"),
+    "lost compile error"
+  );
+  assert!(
+    text.contains("error: could not compile"),
+    "lost build summary"
+  );
+  assert!(!text.contains("Compiling dep_1 "), "kept compile noise");
+  insta::assert_snapshot!("cargo_build_fail", text);
+}
+
+#[test]
 fn cargo_test_chain_saves_at_least_60pct() {
   let raw = include_bytes!("fixtures/cargo-test.txt");
   let out = run_builtin(&["cargo", "test"], raw);
